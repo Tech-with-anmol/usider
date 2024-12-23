@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Usider:lofi-timer",
+    "slug": "Usider",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.jpg",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "backgroundColor": "#333333"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ak.usider"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.jpg",
+        "backgroundColor": "#000000"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c25aaaa0-7f3a-4f28-ae95-06d83f01b271"
+      }
+    }
+  }
+}
