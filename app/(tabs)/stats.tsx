@@ -12,10 +12,7 @@ const Page = (props: Props) => {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.coming}>Coming Soon! - Get all your timer data here, along with many new features.</Text>
-      <TouchableOpacity onPress={learnmore}>
-        <Text>Learn more!</Text>
-      </TouchableOpacity>
+      <Text style={styles.coming}>Coming Soon! - Get all your timer data here, along with many new features.Go to settings to learn more</Text>
     </View>
   )
 }
