@@ -1,5 +1,5 @@
 # "Usider" App
-it is a interactive music & timer app. it provides smoothing calm musics combined with great visual that hel you focus and orgnaise your time.
+it is a interactive music & timer app. it provides smoothing calm musics combined with great visual that help you to focus & orgnaise your time.
 
 # Future
 this is initial version of app and so there is lot and lot of stuff to be adeed. 
