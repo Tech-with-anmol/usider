@@ -7,9 +7,7 @@ type Props = {}
 
 const Page = (props: Props) => {
 
-  const learnmore = () => {
-    router.push('../setting/4')
-  }
+  
   return (
     <View style={styles.container}>
       <Text style={styles.coming}>Coming Soon! - Get all your timer data here, along with many new features.Go to settings to learn more</Text>
