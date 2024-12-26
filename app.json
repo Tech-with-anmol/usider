@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/images/iconan.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.ak.usider"
+      "package": "com.hackclub.usider"
     },
     "plugins": [
       "expo-router",

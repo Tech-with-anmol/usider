@@ -8,7 +8,7 @@
 *.key
 *.mobileprovision
 *.orig.*
-
+/certs
 
 
 # macOS
