@@ -12,11 +12,6 @@
       "distribution": "internal"
     },
     "production" : {},
-    "simulator": {
-      "ios": {
-        "simulator": true
-        }
-       },
     "androidapk": {
        "android": {
           "buildType":"apk"
