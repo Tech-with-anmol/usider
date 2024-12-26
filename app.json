@@ -7,8 +7,10 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash.png",
+      "resizeMode": "contain", 
       "backgroundColor": "#333333"
     },
     "ios": {
@@ -36,6 +38,9 @@
       "eas": {
         "projectId": "c25aaaa0-7f3a-4f28-ae95-06d83f01b271"
       }
+    },
+    "developmentClient": {
+      "silentLaunch": false
     }
   }
 }

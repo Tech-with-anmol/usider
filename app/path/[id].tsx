@@ -158,13 +158,13 @@ const Pathsresult = (props: Props) => {
                           colors={['rgba(0,0,0,0.5)', 'transparent']}
                           style={styles.controls}
                         >
-                          <TouchableOpacity onPress={handleRepeat}>
+                          <TouchableOpacity onPress={handleRepeat} style={styles.controlButton}>
                             <Ionicons name="repeat" size={32} color={isLooping ? "yellow" : "white"} />
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={handlePausePlay}>
+                          <TouchableOpacity onPress={handlePausePlay} style={styles.controlButton}>
                             <Ionicons name={isPlaying ? "pause" : "play"} size={32} color="white" />
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={handleSkip}>
+                          <TouchableOpacity onPress={handleSkip} style={styles.controlButton}>
                             <Ionicons name="play-skip-forward" size={32} color="white" />
                           </TouchableOpacity>
                         </LinearGradient>
@@ -192,7 +192,9 @@ const Pathsresult = (props: Props) => {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
-        {renderContent()}
+        <View style={{ flex: 1 }}>
+          {renderContent()}
+        </View>
       </View>
     </>
   )
@@ -203,15 +205,13 @@ export default Pathsresult
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#333', // darker background color
+    backgroundColor: '#333',
   },
   backgroundImage: {
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
     height: '100%',
   },
   loadingContainer: {
@@ -222,13 +222,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   controls: {
-    position: 'absolute',
-    bottom: 100,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    marginBottom: 40,
     padding: 20,
-    borderRadius: 50
+    borderRadius: 50,
+    width: '80%',
+    marginTop: 40,
+  },
+  controlButton: {
+    marginHorizontal: 10, 
   },
   timerControl: {
     position: 'absolute',

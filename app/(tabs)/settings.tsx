@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: 'rgba(7, 3, 0, 0.99)',
-    paddingTop:50,
+    paddingTop: 30,
   },
   itembtn: {
     flexDirection: 'row',

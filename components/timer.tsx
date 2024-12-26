@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, Animated, Platform, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Animated, Platform, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { Ionicons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 interface TimerProps {
   paused: boolean;
@@ -133,14 +135,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    marginLeft: 20,
-    marginRight: 20,
+    margin: 20, // add margin to create gaps
   },
   digistyle: {
     color: '#fff',
-    fontSize: 60,
+    fontSize: width * 0.15, // responsive font size
     borderRadius: 5,
-    width: 80,
+    width: width * 0.2, // responsive width
     textAlign: 'center',
     paddingVertical: 10,
     borderWidth: 1,
@@ -157,10 +158,8 @@ const styles = StyleSheet.create({
   },
   separatorstyle: {
     color: '#000',
-    fontSize: 60,
+    fontSize: width * 0.15, // responsive font size
     marginHorizontal: 10,
-    marginLeft: -15,
-    marginRight: -15,
   },
   flipContainer: {
     flexDirection: 'row',
@@ -170,8 +169,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   flipCardContainer: {
-    width: 80,
-    height: 100,
+    width: width * 0.2, // responsive width
+    height: width * 0.25, // responsive height
     transform: [{ perspective: 1000 }], // Add perspective to create a 3D effect
   },
   flipCard: {

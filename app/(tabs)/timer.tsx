@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import Timer from '@/components/timer'
 import { Ionicons } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker';
 
 type Props = {}
+
+const { width, height } = Dimensions.get('window');
 
 const Page = (props: Props) => {
   const [timerPaused, setTimerPaused] = useState(false);
@@ -57,27 +59,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20, // add padding to create gaps
+    borderRadius: 10, // add border radius for rounded corners
   },
   timerControl: {
     position: 'absolute',
-    top: 50,
-    left: 20,
+    top: height * 0.05,
+    left: width * 0.05,
   },
   colorControl: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: height * 0.05,
+    right: width * 0.05,
   },
   revertControl: {
     position: 'absolute',
-    top: 50,
-    right: 70,
+    top: height * 0.05,
+    right: width * 0.2,
   },
   colorPickerContainer: {
     position: 'absolute',
-    bottom: 100,
+    bottom: height * 0.1,
     width: '100%',
-    height: 300,
+    height: height * 0.4,
     justifyContent: 'center',
     alignItems: 'center',
   },

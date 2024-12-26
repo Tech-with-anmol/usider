@@ -1,18 +1,18 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import { WebView } from 'react-native-webview';
 
 const Settingsnav = () => {
-    const {id} = useLocalSearchParams<{id : string}>();
+    const { id } = useLocalSearchParams<{ id: string }>();
 
     const renderContents = () => {
-        switch(id) {
+        switch (id) {
             case '1':
                 return (
                     <View style={styles.contactContainer}>
                         <Text style={styles.contactText}>Greetings, thanks for using the app :)</Text>
-                        <Text style={styles.contactEmail}>This is early version of app and so many feautures are yet to be added</Text>
+                        <Text style={styles.contactEmail}>This is early version of app and so many features are yet to be added</Text>
                         <Text style={styles.contactNote}>⛈️ : You can contact me through send feedback option</Text>
                     </View>
                 );
@@ -28,29 +28,31 @@ const Settingsnav = () => {
                 return <WebView source={{ uri: 'https://docs.google.com/document/d/1-11q62gqdJ4W0MRx61Jc-8V2wANymdVLgdzEqBOMNDg/edit?usp=sharing' }} style={{ flex: 1 }} />;
             case '4':
                 return (
-                    <View style={styles.contactContainer}>
-                        <Text style={styles.features}>Upcoming Features</Text>
-                        <Text style={styles.contactText}>ETA : End of January with exception for some features</Text>
-                        <View style={styles.listContainer}>
-                          <Text style={styles.listItem}>1. Stats for your timer and usage</Text>
-                          <Text style={styles.listItem}>2. Custom path</Text>
-                          <Text style={styles.listItem}>3. Your own background and music</Text>
-                          <Text style={styles.listItem}>4. AI generated path</Text>
-                          <Text style={styles.listItem}>5. Chart for timer and in-depth analysis</Text>
-                          <Text style={styles.listItem}>6. Tagging for each timer to organize it</Text>
-                          <Text style={styles.listItem}>7. And many more</Text>
+                    <ScrollView contentContainerStyle={styles.scrollContent}>
+                        <View style={styles.contactContainer}>
+                            <Text style={styles.features}>Upcoming Features</Text>
+                            <Text style={styles.contactText}>ETA : End of January with exception for some features</Text>
+                            <View style={styles.listContainer}>
+                                <Text style={styles.listItem}>1. Stats for your timer and usage</Text>
+                                <Text style={styles.listItem}>2. Custom path</Text>
+                                <Text style={styles.listItem}>3. Your own background and music</Text>
+                                <Text style={styles.listItem}>4. AI generated path</Text>
+                                <Text style={styles.listItem}>5. Chart for timer and in-depth analysis</Text>
+                                <Text style={styles.listItem}>6. Tagging for each timer to organize it</Text>
+                                <Text style={styles.listItem}>7. And many more</Text>
+                            </View>
                         </View>
-                    </View>
+                    </ScrollView>
                 );
             default:
                 return <Text>Invalid ID</Text>;
         }
-    } 
+    }
 
-    return(
+    return (
         <View style={{ flex: 1, backgroundColor: '#1e1e2e' }}>
-        <Stack.Screen options={{headerShown: false}}/>
-        {renderContents()}
+            <Stack.Screen options={{ headerShown: false }} />
+            {renderContents()}
         </View>
     )
 }
@@ -72,10 +74,10 @@ const styles = StyleSheet.create({
     color: '#cdd6f4'
   },
   features: {
-     fontSize: 25,
-     color: '#f5c2e7',
-     paddingBottom: 30,
-     fontWeight: '600'
+    fontSize: 25,
+    color: '#f5c2e7',
+    paddingBottom: 30,
+    fontWeight: '600'
   },
   contactEmail: {
     fontSize: 16,
@@ -96,5 +98,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#cdd6f4',
     marginBottom: 10,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
