@@ -52,7 +52,8 @@ export default function Homescreen() {
     }
 
     const imageSize = width * 0.3; // Adjust the size based on the device width
-    const tipTextMarginTop = height * 0.27; // Adjust the margin based on the device height
+    const tipTextMarginTop = height * 0.17; // Adjust the margin based on the device height
+    const tipTextMarginBottom = height * 0.1; // Add bottom margin to ensure it doesn't overlap with the tab bar
   
     return (
         <SafeAreaView style={styles.container}>
@@ -102,7 +103,7 @@ export default function Homescreen() {
                 </TouchableOpacity>
               </Animated.View>
             </View>
-            <Text style={[styles.tiptext, { marginTop: tipTextMarginTop }]}>        
+            <Text style={[styles.tiptext, { marginTop: tipTextMarginTop, marginBottom: tipTextMarginBottom }]}>        
               💭 : Don't overthink it. Select whatever image resonate with your current mood.
             </Text>  
           </ScrollView>
@@ -169,5 +170,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     textAlign: 'center',
+    
   },
 });
