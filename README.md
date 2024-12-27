@@ -1,4 +1,7 @@
 # "Usider" App
+
+https://testflight.apple.com/join/aAdz9fsT
+
 it is a interactive music & timer app. it provides smoothing calm musics combined with great visual that help you to focus & orgnaise your time.
 
 # Future
