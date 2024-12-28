@@ -2,7 +2,7 @@
   "expo": {
     "name": "Usider",
     "slug": "Usider",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -10,23 +10,17 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain", 
+      "resizeMode": "contain",
       "backgroundColor": "#333333"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.hackclub.usider"
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/iconan.png",
-        "backgroundColor": "#000000"
-      },
-      "package": "com.hackclub.usider"
-    },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true

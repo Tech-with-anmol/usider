@@ -21,12 +21,8 @@ const Page = (props: Props) => {
     router.push('../setting/4')
   }
   return (
-    <>
-    <Stack.Screen options={{
-      headerShown:false,
-  
-      }}/>
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown : false}}/>
       <TouchableOpacity onPress={btn1} style={styles.itembtn}>
       <Text style ={styles.itembtntxt}>About</Text>
       <MaterialIcons
@@ -52,7 +48,6 @@ const Page = (props: Props) => {
       color='#fff'/>
       </TouchableOpacity>
     </View>
-    </>
   )
 }
 
@@ -78,5 +73,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     color: '#fff',
-  }
+  },
+  backButton: {
+    marginLeft: 10,
+    marginTop: 10,
+  },
 })

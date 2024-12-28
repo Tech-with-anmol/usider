@@ -1,16 +1,20 @@
-import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, TouchableOpacity, Platform, TextInput } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useLocalSearchParams, useFocusEffect } from 'expo-router'
+import { useLocalSearchParams, useFocusEffect, useRouter, Stack } from 'expo-router'
 import Timer from '@/components/timer'
 import { getRandomFileFromBucket } from '@/lib/appwrite'
+import { SQLiteProvider, useSQLiteContext , type SQLiteDatabase} from 'expo-sqlite'
 
-type Props = {}
+
+type Props  = {}
+
 
 const Pathsresult = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const [randomFile, setRandomFile] = useState<{ url: string } | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,6 +23,17 @@ const Pathsresult = (props: Props) => {
   const isLoopingRef = useRef(isLooping);
   const [showControls, setShowControls] = useState(true);
   const [timerPaused, setTimerPaused] = useState(false);
+  const [timerName, setTimerName] = useState('');
+  const [isNaming, setIsNaming] = useState(true);
+
+
+  
+    const createIFNeeded = async (db : SQLiteDatabase) => {
+      db.execAsync(
+        'CREATE TABLE IF NOT EXISTS timers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, totaltime INTEGER);'
+      );
+    };
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -42,11 +57,18 @@ const Pathsresult = (props: Props) => {
       };
     }, [id])
   );
-
+  
+  const settimertxt = async (db : SQLiteDatabase) => {
+    const datas = await db.runAsync(
+      'INSERT INTO timers (name, totaltime) VALUES (?, ?):',
+      [timerName, 0]
+    )
+    console.log(datas.lastInsertRowId, datas.changes);
+  }
   const fetchRandomFile = async () => {
     try {
       const bucketId = id === '1' ? '676812e900174837d6be' : '6768e40f002fa8da3469';
-      const file = await getRandomFileFromBucket(bucketId);
+      const file : any = await getRandomFileFromBucket(bucketId);
       setRandomFile({ url: file.url });
     } catch (error) {
       console.error('Error fetching random file:', error);
@@ -134,20 +156,36 @@ const Pathsresult = (props: Props) => {
       case '2':
         return (
           randomFile ? (
+            <SQLiteProvider databaseName='timer.db' onInit={createIFNeeded}>
             <TouchableOpacity
               style={styles.backgroundImage}
               activeOpacity={1}
               onPress={handleScreenTap}
             >
+              
               <ImageBackground
                 source={{ uri: randomFile.url }}
                 style={styles.backgroundImage}
                 onLoadStart={() => setLoading(true)}
-                onLoadEnd={() => setLoading(false)}
               >
+
                 {loading ? (
+                  
                   <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#ffffff" />
+                 
+                    
+                    <View >
+                    <TextInput
+                    style={styles.input}
+                    placeholder="What work you will be doing?"
+                    placeholderTextColor="#aaa"
+                    value={timerName}
+                    onChangeText={setTimerName}
+                    ></TextInput>
+                    <TouchableOpacity style={styles.savebtn}>
+                      <Text style={styles.savebtntxt}>Save</Text>
+                    </TouchableOpacity>   
+                  </View>    
                   </View>
                 ) : (
                   <>
@@ -171,15 +209,20 @@ const Pathsresult = (props: Props) => {
                         <TouchableOpacity style={styles.timerControl} onPress={handleTimerPause}>
                           <Ionicons name={timerPaused ? "play" : "pause"} size={32} color="white" />
                         </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                          <Ionicons name="chevron-back-outline" size={32} color="white" />
+                        </TouchableOpacity>
                       </>
                     )}
                   </>
-                )}
-              </ImageBackground>
+                )} 
+                </ImageBackground>
             </TouchableOpacity>
+            </SQLiteProvider>
           ) : (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#ffffff" />
+              
             </View>
           )
         );
@@ -189,23 +232,22 @@ const Pathsresult = (props: Props) => {
   }
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.container}>
-        <View style={{ flex: 1 }}>
-          {renderContent()}
-        </View>
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false}}/>
+      
+      <View style={{ flex: 1 }}>
+        {renderContent()}
       </View>
-    </>
+    </View>
   )
 }
 
 export default Pathsresult
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333',
+
   },
   backgroundImage: {
     flex: 1,
@@ -220,6 +262,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.81)',
     width: '100%',
+  },
+  namingContainer : {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  input : {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom : 20,
+    paddingHorizontal : 10,
+    color: 'white',
+
+  },
+  savebtn : {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 10,
+  },
+  savebtntxt : {
+    color: 'white'
   },
   controls: {
     flexDirection: 'row',
@@ -236,7 +300,13 @@ const styles = StyleSheet.create({
   },
   timerControl: {
     position: 'absolute',
-    top: 50,
+    top: Platform.OS  === 'ios' ? 60 : 30,
+    left: 60,
+  },
+  backButton: {
+    position: 'absolute',
+    top: Platform.OS  === 'ios' ? 60 : 30,
     left: 20,
   },
+  
 })

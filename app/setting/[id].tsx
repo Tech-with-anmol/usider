@@ -1,10 +1,12 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native'
 import React from 'react'
-import { Stack, useLocalSearchParams } from 'expo-router'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { WebView } from 'react-native-webview';
+import { Ionicons } from '@expo/vector-icons';
 
 const Settingsnav = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
+    const router = useRouter();
 
     const renderContents = () => {
         switch (id) {
@@ -51,7 +53,10 @@ const Settingsnav = () => {
 
     return (
         <View style={{ flex: 1, backgroundColor: '#1e1e2e' }}>
-            <Stack.Screen options={{ headerShown: false }} />
+          <Stack.Screen options={{ headerShown: false}}/>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Ionicons name="chevron-back" size={24} color="white" />
+            </TouchableOpacity>
             {renderContents()}
         </View>
     )
@@ -103,5 +108,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  backButton: {
+    marginLeft: 10,
+    marginTop: Platform.OS === 'ios' ? 70 : 10
   },
 });

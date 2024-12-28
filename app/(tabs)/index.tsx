@@ -1,14 +1,11 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native'
+import { StyleSheet, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Pathselector from '@/components/pathselector'
-import { NewsDataType } from "@/types";
 
-type Props = {
-  slideItem: NewsDataType;
-};
 
-const Page = ({slideItem}: Props) => {
+
+const Page = () => {
   const {top: safeTop} = useSafeAreaInsets();
 
   return (
