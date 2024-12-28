@@ -3,10 +3,33 @@ import React from 'react'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
+import { Account } from 'react-native-appwrite';
+import { client } from '@/lib/appwrite';
+import Toast from 'react-native-toast-message';
 
 const Settingsnav = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
+    const account = new Account(client);
+
+    const handleLogout = async () => {
+        try {
+            await account.deleteSession('current');
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Logged out successfully',
+            });
+            router.replace('/sign_in');
+        } catch (error) {
+            console.error('Error logging out:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to log out',
+            });
+        }
+    };
 
     const renderContents = () => {
         switch (id) {
@@ -46,6 +69,14 @@ const Settingsnav = () => {
                         </View>
                     </ScrollView>
                 );
+            case '5':
+                return (
+                    <View style={styles.contactContainer}>
+                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                            <Text style={styles.logoutButtonText}>Log Out</Text>
+                        </TouchableOpacity>
+                    </View>
+                );
             default:
                 return <Text>Invalid ID</Text>;
         }
@@ -58,6 +89,7 @@ const Settingsnav = () => {
                 <Ionicons name="chevron-back" size={24} color="white" />
             </TouchableOpacity>
             {renderContents()}
+            <Toast />
         </View>
     )
 }
@@ -112,5 +144,15 @@ const styles = StyleSheet.create({
   backButton: {
     marginLeft: 10,
     marginTop: Platform.OS === 'ios' ? 70 : 10
+  },
+  logoutButton: {
+    backgroundColor: '#f38ba8',
+    padding: 15,
+    borderRadius: 8,
+  },
+  logoutButtonText: {
+    color: '#1e1e2e',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

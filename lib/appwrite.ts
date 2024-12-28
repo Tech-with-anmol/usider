@@ -1,12 +1,10 @@
-import { Client, Storage } from 'react-native-appwrite';
-
+import { Client, Account, Storage, OAuthProvider } from 'react-native-appwrite';
 
 const client = new Client()
     .setProject('67678ff80037c2cf1dee')
     .setPlatform('com.ak.usider');
 
-
-
+export { OAuthProvider, Account }; 
 const storage = new Storage(client);
 
 export const getRandomFileFromBucket = async (bucketId: string) => {
@@ -24,3 +22,5 @@ export const getRandomFileFromBucket = async (bucketId: string) => {
     throw error;
   }
 };
+
+export { client };
