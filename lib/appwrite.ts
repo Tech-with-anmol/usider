@@ -3,10 +3,8 @@ import { Client, Account, Storage, OAuthProvider, Databases } from 'react-native
 let client : Client;
 
 client = new Client()
-client
-    .setEndpoint('https://cloud.appwrite.io/v1') 
-    .setProject('67678ff80037c2cf1dee'); 
-    
+  .setEndpoint('https://cloud.appwrite.io/v1') 
+  .setProject('67678ff80037c2cf1dee'); 
 
 export { OAuthProvider, Account, Databases }; 
 const storage = new Storage(client);
@@ -27,4 +25,5 @@ export const getRandomFileFromBucket = async (bucketId: string) => {
   }
 };
 
-export { client };
+let streakCollectionId = '67712c550012a4888594';
+export { client, streakCollectionId };

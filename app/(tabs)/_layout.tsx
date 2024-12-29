@@ -6,6 +6,7 @@ const TabLayout = () => {
   return (
     <Tabs tabBar={(props) => <TabBar {...props} />} screenOptions={{
       headerShown:false,
+      animation: 'fade'
     }}>
       <Tabs.Screen
         name="index"
@@ -22,7 +23,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="timer"
         options={{
-          title: "Timer",
+          title: "Stopwatch",
         }}
       />
       <Tabs.Screen
@@ -31,6 +32,11 @@ const TabLayout = () => {
           title: "Settings",
         }}
       />
+      <Tabs.Screen
+        name="to_do"
+        options={{
+          title: "To-Do",
+        }}/>
     </Tabs>
   )
 }

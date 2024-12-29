@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Dimensions, View } from "react-native";
 import React, { useEffect } from "react";
 import { icon } from "@/constants/Icons";
 import Animated, {
+  Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -23,6 +24,7 @@ const TabBarButton = ({
   label: string;
 }) => {
   const opacity = useSharedValue(0);
+  const screenWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     opacity.value = withSpring(
@@ -32,7 +34,7 @@ const TabBarButton = ({
   }, [opacity, isFocused]);
 
   const animatedTextStyle = useAnimatedStyle(() => {
-    const opacityValue = interpolate(opacity.value, [0, 1], [1, 0]);
+    const opacityValue = interpolate(opacity.value, [0, 1], [1, 0])
 
     return {
       opacity: opacityValue,
@@ -43,17 +45,19 @@ const TabBarButton = ({
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
-      style={styles.tabbarBtn}
+      style={[styles.tabbarBtn, { width: screenWidth / 5 }]}
     >
-      {icon[routeName]({
-        color: isFocused ? Colors.tabIconSelected : Colors.tabIconDefault,
-        focused: isFocused,
-      })}
+      <View style={styles.iconContainer}>
+        {icon[routeName]({
+          color: isFocused ? Colors.tabIconSelected : Colors.tabIconDefault,
+          focused: isFocused,
+        })}
+      </View>
       <Animated.Text
         style={[
+          styles.label,
           {
             color: isFocused ? Colors.tabIconSelected : Colors.tabIconDefault,
-            fontSize: 12,
           },
           animatedTextStyle,
         ]}
@@ -72,5 +76,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
+  },
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  label: {
+    fontSize: 12,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

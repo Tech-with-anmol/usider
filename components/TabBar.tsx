@@ -1,4 +1,4 @@
-import { View, StyleSheet, LayoutChangeEvent } from "react-native";
+import { View, StyleSheet, LayoutChangeEvent, Dimensions } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import TabBarButton from "@/components/TabBarButton";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -31,7 +31,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         position: 'absolute',
         backgroundColor: Colors.tint,
         top: 52,
-        left: 34,
+        left: Dimensions.get('window').width / state.routes.length / 2 - 15,
         height: 8,
         width: 30,
       }]} />
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: 16,
     paddingBottom: 20,
-    backgroundColor: 'rgba(92, 74, 51, 0.27)',
+    backgroundColor: 'rgba(92, 74, 51, 0.4)',
     borderRadius:25,
     marginBottom: 10,
     position:'absolute',

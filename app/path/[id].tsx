@@ -48,12 +48,16 @@ const Pathsresult = () => {
       try {
         const user = await account.get();
         setUserId(user.$id);
+
       } catch (error) {
         console.error('Error fetching user:', error);
       }
     };
     getUser();
   }, []);
+
+  
+   
 
   useFocusEffect(
     React.useCallback(() => {
@@ -178,13 +182,11 @@ const Pathsresult = () => {
     }
 
     try {
-      // Create a new timer with creation time
-      const creationTime = new Date().toISOString();
+      // Create a new timer without creation time
       await databases.createDocument('67700254003a7728ac47', '6770037e0017ef452669', 'unique()', {
         userId,
         timerName,
         totalTime: elapsedTime,
-        creationTime,
       });
 
       setIsNaming(false);
@@ -251,7 +253,7 @@ const Pathsresult = () => {
       setCustomDurationModalVisible(false);
     }
   };
-
+ 
   const renderContent = () => {
     switch (id) {
       case '1':
@@ -447,10 +449,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(78, 54, 54, 0.16)',
   },
   modalContent: {
-    backgroundColor: '#1e1e2e',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -466,36 +468,45 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 8,
     backgroundColor: '#313244',
+    borderTopColor: 'rgb(253, 250, 250)'
   },
   durationText: {
     color: '#cdd6f4',
-    fontSize: 16,
+    fontSize: 17,
     marginBottom: 10,
+    fontWeight: '700'
   },
   durationOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   durationButton: {
-    backgroundColor: '#f38ba8',
+    backgroundColor: 'rgba(36, 189, 125, 0.4)',
     padding: 10,
     borderRadius: 10,
     margin: 5,
+    borderWidth: 3,
+    borderColor: 'rgba(29, 160, 106, 0.8)',
+    
   },
   selectedButton: {
-    backgroundColor: '#cdd6f4',
+    backgroundColor: 'rgba(24, 202, 84, 0.8)',
   },
   durationButtonText: {
-    color: '#1e1e2e',
+    color: 'rgb(248, 250, 249)',
+    fontWeight: '500',
   },
   savebtn: {
-    backgroundColor: '#f38ba8',
+    backgroundColor: 'rgba(32, 207, 134, 0.4)',
     padding: 10,
     borderRadius: 10,
+    borderWidth: 3,
+    borderColor: 'rgba(36, 177, 118, 0.8)',
   },
   savebtntxt: {
-    color: '#1e1e2e',
+    color: 'rgba(253, 250, 250, 0.8)',
+    fontWeight: '500',
   },
 })

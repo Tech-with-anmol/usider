@@ -44,7 +44,7 @@ const SignInScreen = () => {
 
         try {
             await account.createEmailPasswordSession(email, password);
-            await account.createVerification(email);
+            
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -56,7 +56,7 @@ const SignInScreen = () => {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to sign in',
+                text2: 'Failed to sign in, ensure your email and password are correct',
             });
         }
     };

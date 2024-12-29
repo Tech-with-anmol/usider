@@ -25,4 +25,10 @@ export const icon = {
     ) : (
       <Ionicons name="cog-outline" size={24} color={color} />
     ),
+  to_do: ({ color, focused }: { color: string; focused: boolean }) =>
+    focused ? (
+      <Ionicons name="list" size={24} color={color} />
+    ) : (
+      <Ionicons name="list-outline" size={24} color={color} />
+    ),
 };

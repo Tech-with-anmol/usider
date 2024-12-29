@@ -1,16 +1,31 @@
-import { StyleSheet, Text, View, FlatList, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Account, Databases, Query } from 'react-native-appwrite'
 import { client } from '@/lib/appwrite'
 import Toast from 'react-native-toast-message'
 import { useFocusEffect } from '@react-navigation/native'
-import { LineChart } from 'react-native-chart-kit'
+import { BarChart, PieChart } from 'react-native-chart-kit'
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
+
+const pathNames: { [key: string]: string } = {
+  '1': 'Lo-fi',
+  '2': 'Nature'
+};
+
+const pieChartColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
 const StatsPage = () => {
   const [timerData, setTimerData] = useState<any[]>([]);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [todayTime, setTodayTime] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [chartData, setChartData] = useState<{ labels: string[], datasets: { data: number[], formattedData: string[] }[] }>({ labels: [], datasets: [{ data: [], formattedData: [] }] });
+  const [pathSelectionData, setPathSelectionData] = useState<{ name: string, count: number, percentage: number, color: string }[]>([]);
+  const [barChartData, setBarChartData] = useState<{ labels: string[], datasets: { data: number[] }[] }>({ labels: [], datasets: [{ data: [] }] });
+
+  let [fontsLoaded] = useFonts({
+    Poppins_600SemiBold,
+  });
 
   const account = new Account(client);
   const databases = new Databases(client);
@@ -21,6 +36,7 @@ const StatsPage = () => {
         const user = await account.get();
         setUserId(user.$id);
         fetchTimerData(user.$id);
+        fetchPathSelectionData(user.$id);
       } catch (error) {
         console.error('Error fetching user:', error);
         Toast.show({
@@ -37,6 +53,7 @@ const StatsPage = () => {
     React.useCallback(() => {
       if (userId) {
         fetchTimerData(userId);
+        fetchPathSelectionData(userId);
       }
     }, [userId])
   );
@@ -49,12 +66,41 @@ const StatsPage = () => {
       setTimerData(response.documents);
       calculateTotalTime(response.documents);
       calculateTodayTime(response.documents);
+      calculateChartData(response.documents);
+      calculateBarChartData(response.documents);
     } catch (error) {
       console.error('Error fetching timer data:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: 'Failed to fetch timer data',
+      });
+    }
+  };
+
+  const fetchPathSelectionData = async (userId: string) => {
+    try {
+      const response = await databases.listDocuments('67700254003a7728ac47', '67712065003e44192265', [
+        Query.equal('userId', userId)
+      ]);
+      const pathData = response.documents.reduce((acc: { [key: string]: number }, doc: any) => {
+        acc[doc.pathId] = (acc[doc.pathId] || 0) + 1;
+        return acc;
+      }, {});
+      const totalSelections = Object.values(pathData).reduce((acc, count) => acc + count, 0);
+      const formattedPathData = Object.entries(pathData).map(([id, count], index) => ({
+        name: pathNames[id] || id,
+        count,
+        percentage: parseFloat(((count / totalSelections) * 100).toFixed(2)),
+        color: pieChartColors[index % pieChartColors.length]
+      }));
+      setPathSelectionData(formattedPathData);
+    } catch (error) {
+      console.error('Error fetching path selection data:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to fetch path selection data',
       });
     }
   };
@@ -67,9 +113,72 @@ const StatsPage = () => {
   const calculateTodayTime = (documents: any[]) => {
     const today = new Date().toISOString().split('T')[0];
     const todayTotal = documents
-      .filter(doc => doc.creationTime.split('T')[0] === today)
+      .filter(doc => doc.$createdAt && doc.$createdAt.split('T')[0] === today)
       .reduce((acc, doc) => acc + doc.totalTime, 0);
     setTodayTime(todayTotal);
+  };
+
+  const formatTimeValue = (time: number) => {
+    if (time >= 3600) {
+      return `${(time / 3600).toFixed(1)}h`;
+    } else if (time >= 60) {
+      return `${(time / 60).toFixed(1)}m`;
+    } else {
+      return `${time}s`;
+    }
+  };
+
+  const calculateChartData = (documents: any[]) => {
+    const timerMap: { [key: string]: number } = {};
+
+    documents.forEach(doc => {
+      if (doc.timerName && doc.totalTime) {
+        if (timerMap[doc.timerName]) {
+          timerMap[doc.timerName] += doc.totalTime;
+        } else {
+          timerMap[doc.timerName] = doc.totalTime;
+        }
+      }
+    });
+
+    const sortedTimers = Object.entries(timerMap)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 4);
+
+    const labels = sortedTimers.map(([name]) => name);
+    const data = sortedTimers.map(([, time]) => time);
+    const formattedData = data.map(formatTimeValue);
+
+    setChartData({
+      labels,
+      datasets: [{ data, formattedData }]
+    });
+  };
+
+  const calculateBarChartData = (documents: any[]) => {
+    const timerMap: { [key: string]: number } = {};
+
+    documents.forEach(doc => {
+      if (doc.timerName && doc.totalTime) {
+        if (timerMap[doc.timerName]) {
+          timerMap[doc.timerName] += doc.totalTime;
+        } else {
+          timerMap[doc.timerName] = doc.totalTime;
+        }
+      }
+    });
+
+    const sortedTimers = Object.entries(timerMap)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5);
+
+    const labels = sortedTimers.map(([name]) => name);
+    const data = sortedTimers.map(([, time]) => time);
+
+    setBarChartData({
+      labels,
+      datasets: [{ data }]
+    });
   };
 
   const formatTime = (time: number) => {
@@ -79,33 +188,23 @@ const StatsPage = () => {
     return `${hours}h ${minutes}m ${seconds}s`;
   };
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemText}>{item.timerName}</Text>
-      <Text style={styles.itemText}>{formatTime(item.totalTime)}</Text>
-    </View>
-  );
-
-  const chartData = {
-    labels: ['0h', '4h', '8h', '12h', '16h', '20h', '24h'],
-    datasets: [
-      {
-        data: [0, 2, 4, 6, 8, 10, 12], // Replace with actual data
-        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-        strokeWidth: 2 // optional
-      }
-    ],
-    legend: ['Time Spent Today'] // optional
-  };
+  if (!fontsLoaded) {
+    return null; // or a loading spinner
+  }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Your Timer Stats</Text>
       <View style={styles.chartContainer}>
-        <LineChart
-          data={chartData}
+        <BarChart
+          data={{
+            labels: chartData.labels,
+            datasets: [{ data: chartData.datasets[0].data }]
+          }}
           width={Dimensions.get('window').width - 40}
-          height={220}
+          height={270}
+          yAxisLabel=""
+          yAxisSuffix=""
           chartConfig={{
             backgroundColor: '#1e1e2e',
             backgroundGradientFrom: '#1e1e2e',
@@ -122,7 +221,9 @@ const StatsPage = () => {
               stroke: '#ffa726'
             }
           }}
-          bezier
+          fromZero
+          showValuesOnTopOfBars
+          verticalLabelRotation={20}
           style={{
             marginVertical: 8,
             borderRadius: 16
@@ -130,18 +231,79 @@ const StatsPage = () => {
         />
       </View>
       <Text style={styles.todayTimeText}>Total Time Spent Today: {formatTime(todayTime)}</Text>
-      <FlatList
-        data={timerData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.$id}
-        ListHeaderComponent={() => (
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>Total Time Spent: {formatTime(totalTime)}</Text>
-          </View>
-        )}
-      />
+      <View style={styles.chartContainer}>
+        <PieChart
+          data={pathSelectionData.map(item => ({
+            name: `${item.name}: ${item.percentage}%`,
+            population: item.count,
+            color: item.color,
+            legendFontColor: '#cdd6f4',
+            legendFontSize: 15
+          }))}
+          width={Dimensions.get('window').width - 40}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#1e1e2e',
+            backgroundGradientFrom: '#1e1e2e',
+            backgroundGradientTo: '#1e1e2e',
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+          absolute
+        />
+      </View>
+      
+      <View style={styles.chartContainer}>
+        <BarChart
+          data={{
+            labels: barChartData.labels,
+            datasets: [{ data: barChartData.datasets[0].data }]
+          }}
+          width={Dimensions.get('window').width - 40}
+          height={270}
+          yAxisLabel=""
+          yAxisSuffix=""
+          chartConfig={{
+            backgroundColor: '#1e1e2e',
+            backgroundGradientFrom: '#1e1e2e',
+            backgroundGradientTo: '#1e1e2e',
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16
+            },
+            propsForDots: {
+              r: '6',
+              strokeWidth: '2',
+              stroke: '#ffa726'
+            }
+          }}
+          fromZero
+          showValuesOnTopOfBars
+          verticalLabelRotation={20}
+          style={{
+            marginVertical: 8,
+            borderRadius: 16
+          }}
+        />
+      </View>
+      <Text style={styles.totalTimeText}>Total Time Spent: {formatTime(totalTime)}</Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
       <Toast />
-    </View>
+    </ScrollView>
   )
 }
 
@@ -152,6 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1e1e2e',
     padding: 20,
+    
   },
   title: {
     fontSize: 24,
@@ -159,6 +322,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     fontWeight: '600',
+    fontFamily: 'Poppins_600SemiBold',
   },
   chartContainer: {
     alignItems: 'center',
@@ -170,6 +334,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     fontWeight: '500',
+    fontFamily: 'Poppins_600SemiBold',
+  },
+  totalTimeText: {
+    fontSize: 18,
+    color: '#cdd6f4',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontWeight: '500',
+    fontFamily: 'Poppins_600SemiBold',
   },
   headerContainer: {
     marginBottom: 20,
@@ -179,6 +352,7 @@ const styles = StyleSheet.create({
     color: '#cdd6f4',
     textAlign: 'center',
     fontWeight: '500',
+    fontFamily: 'Poppins_600SemiBold',
   },
   itemContainer: {
     flexDirection: 'row',
@@ -191,5 +365,6 @@ const styles = StyleSheet.create({
   itemText: {
     color: '#cdd6f4',
     fontSize: 16,
+    fontFamily: 'Poppins_600SemiBold',
   },
 })

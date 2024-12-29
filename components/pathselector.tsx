@@ -1,13 +1,16 @@
-import { View, Text, StyleSheet, Platform, Image, TouchableOpacity, Dimensions, ScrollView } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet, Platform, Image, TouchableOpacity, Dimensions, ScrollView, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import Svg, { Path } from 'react-native-svg';
 import { useFonts, DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import * as Splashscreen from 'expo-splash-screen';
-import { Audio } from 'expo-av';
 import { Link, router, useFocusEffect } from 'expo-router';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Account, Databases, Query } from 'react-native-appwrite';
+import { client, streakCollectionId } from '@/lib/appwrite';
+import Toast from 'react-native-toast-message';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,16 +18,21 @@ Splashscreen.preventAutoHideAsync();
 
 export default function Homescreen() {
       
-    const backgroundMusic = useRef<Audio.Sound | null>(null);
     const [bgColor2, setBgColor2] = useState('#163431');
     const [bgColor1, setBgColor1] = useState('#255411');
+    const [loading, setLoading] = useState(true);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [streak, setStreak] = useState<number>(0);
+    const [showStreakAnimation, setShowStreakAnimation] = useState<boolean>(false);
     
-    const btnn = () => {
+    const btnn = async () => {
       setBgColor1(bgColor1 === '#255411' ? 'transparent' : '#255411');
+      await logPathSelection('2');
       router.push('../path/2')
     }
-    const btnf = () => {
+    const btnf = async () => {
       setBgColor2(bgColor2 === '#163431' ? 'transparent' : '#163431');
+      await logPathSelection('1');
       router.push('../path/1')
     }
 
@@ -32,23 +40,121 @@ export default function Homescreen() {
         DMSerifDisplay_400Regular,
         Poppins_600SemiBold,
     });
+
+    const account = new Account(client);
+    const databases = new Databases(client);
+
+    useEffect(() => {
+        const getUser = async () => {
+          try {
+            const user = await account.get();
+            setUserId(user.$id);
+            updateStreak(user.$id);
+          } catch (error) {
+            console.error('Error fetching user:', error);
+          }
+        };
+        getUser();
+    }, []);
+
+    const logPathSelection = async (pathId: string) => {
+      if (!userId) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'User not found',
+        });
+        return;
+      }
+
+      try {
+        await databases.createDocument('67700254003a7728ac47', '67712065003e44192265', 'unique()', {
+          userId,
+          pathId,
+        });
+      } catch (error) {
+        console.error('Error logging path selection:', error);
+      }
+    };
+
+    const updateStreak = async (userId: string) => {
+      try {
+        const response = await databases.listDocuments('67700254003a7728ac47', streakCollectionId, [
+          Query.equal('userId', userId)
+        ]);
+        const streakData = response.documents[0];
+        const today = new Date().toISOString().split('T')[0];
+
+        if (streakData) {
+          const lastLoginDate = streakData.lastLoginDate.split('T')[0];
+          if (lastLoginDate === today) {
+            setStreak(streakData.streak);
+          } else {
+            const newStreak = lastLoginDate === new Date(Date.now() - 86400000).toISOString().split('T')[0] ? streakData.streak + 1 : 1;
+            await databases.updateDocument('67700254003a7728ac47', streakCollectionId, streakData.$id, {
+              streak: newStreak,
+              lastLoginDate: new Date().toISOString()
+            });
+            setStreak(newStreak);
+            setShowStreakAnimation(true);
+          }
+        } else {
+          await databases.createDocument('67700254003a7728ac47', streakCollectionId, 'unique()', {
+            userId,
+            streak: 1,
+            lastLoginDate: new Date().toISOString()
+          });
+          setStreak(1);
+          setShowStreakAnimation(true);
+        }
+      } catch (error) {
+        console.error('Error updating streak:', error);
+      }
+    };
       
     useEffect(() => {
         if(loaded || error) {
           Splashscreen.hideAsync()
+          setLoading(false);
         }
     }, [loaded, error]);
 
     useFocusEffect(
       React.useCallback(() => {
-        
         setBgColor1('#255411');
         setBgColor2('#163431');
       }, [])
     );
 
-    if (!loaded && !error) {
-        return null;
+    const streakPosition = useSharedValue({ top: 20, right: 20 });
+    const streakScale = useSharedValue(1);
+
+    useEffect(() => {
+      if (showStreakAnimation) {
+        streakPosition.value = withTiming({ top: height / 2 - 50, right: width / 2 - 75 }, { duration: 1000, easing: Easing.out(Easing.exp) });
+        streakScale.value = withTiming(2, { duration: 1000, easing: Easing.out(Easing.exp) }, () => {
+          setTimeout(() => {
+            streakPosition.value = withTiming({ top: 20, right: 20 }, { duration: 1000, easing: Easing.in(Easing.exp) });
+            streakScale.value = withTiming(1, { duration: 1000, easing: Easing.in(Easing.exp) });
+          }, 2000);
+        });
+      }
+    }, [showStreakAnimation]);
+
+    const animatedStreakStyle = useAnimatedStyle(() => {
+      return {
+        top: streakPosition.value.top,
+        right: streakPosition.value.right,
+        transform: [{ scale: streakScale.value }],
+      };
+    });
+
+    if (loading) {
+        return (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#f38ba8" />
+          </View>
+        );
     }
 
     const imageSize = width * 0.3; // Adjust the size based on the device width
@@ -59,6 +165,10 @@ export default function Homescreen() {
         <SafeAreaView style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.title}>Paths</Text>
+            <Animated.View style={[styles.streakContainer, animatedStreakStyle]}>
+              <Ionicons name="flame" size={24} color="orange" />
+              <Text style={styles.streakText}>{streak}</Text>
+            </Animated.View>
             <View style={styles.svgWrapper}>
               <Svg
                 viewBox="0 0 300 300"
@@ -128,6 +238,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
   },
+  streakContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+  },
+  streakText: {
+    color: 'orange',
+    fontSize: 26,
+    marginLeft: 5,
+    fontWeight: 600,
+  },
   svgWrapper: {
     position: 'relative',
     width: '80%',
@@ -171,5 +292,11 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1e1e2e',
   },
 });
