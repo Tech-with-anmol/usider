@@ -30,6 +30,15 @@ const SignUpScreen = () => {
             return;
         }
 
+        if (password.length < 8) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Password must be at least 8 characters long',
+            });
+            return;
+        }
+
         if (password !== confirmPassword) {
             Toast.show({
                 type: 'error',
@@ -41,7 +50,6 @@ const SignUpScreen = () => {
 
         try {
             await account.create('unique()', email, password, name);
-            await account.createVerification(email);
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -53,29 +61,11 @@ const SignUpScreen = () => {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to create account',
+                text2: `Failed to create account: ${error}`,
             });
         }
     };
 
-    const handleGoogleSignUp = async () => {
-        try {
-            await account.createOAuth2Session(OAuthProvider.Google);
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Signed up with Google successfully',
-            });
-            router.replace('/(tabs)');
-        } catch (error) {
-            console.error('Error signing up with Google:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to sign up with Google',
-            });
-        }
-    };
 
     if (!fontsLoaded) {
         return null; // or a loading spinner
@@ -122,10 +112,6 @@ const SignUpScreen = () => {
             />
             <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                 <Text style={styles.buttonText}>Sign up</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignUp}>
-                <AntDesign name="google" size={24} color="white" style={styles.googleIcon} />
-                <Text style={styles.googleButtonText}>Sign up with Google</Text>
             </TouchableOpacity>
             <View style={styles.signInContainer}>
                 <Text style={styles.signInText}>Already have an account?</Text>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { Account, OAuthProvider } from 'react-native-appwrite';
@@ -44,6 +44,7 @@ const SignInScreen = () => {
 
         try {
             await account.createEmailPasswordSession(email, password);
+            await account.createVerification(email);
             Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -60,27 +61,16 @@ const SignInScreen = () => {
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        try {
-            await account.createOAuth2Session(OAuthProvider.Google);
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Signed in with Google successfully',
-            });
-            router.replace('/(tabs)');
-        } catch (error) {
-            console.error('Error signing in with Google:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to sign in with Google',
-            });
-        }
-    };
+   
+
 
     if (!fontsLoaded) {
-        return null; // or a loading spinner
+        return (
+            <View style={styles.loadingContainer}>
+                <Stack.Screen options={{ headerShown: false}}/>
+                <ActivityIndicator size="large" color="#f38ba8" />
+            </View>
+        );
     }
 
     return (
@@ -110,10 +100,7 @@ const SignInScreen = () => {
             <TouchableOpacity style={styles.button} onPress={handleSignIn}>
                 <Text style={styles.buttonText}>Sign in</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-                <AntDesign name="google" size={24} color="white" style={styles.googleIcon} />
-                <Text style={styles.googleButtonText}>Sign in with Google</Text>
-            </TouchableOpacity>
+            
             <View style={styles.signUpContainer}>
                 <Text style={styles.signUpText}>Don't have an account?</Text>
                 <TouchableOpacity onPress={() => router.replace('../sign_up')}>
@@ -131,6 +118,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#1e1e2e',
         justifyContent: 'center',
         padding: 20,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#1e1e2e',
     },
     logo: {
         width: 100,

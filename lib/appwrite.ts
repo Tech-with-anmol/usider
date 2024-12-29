@@ -1,10 +1,14 @@
-import { Client, Account, Storage, OAuthProvider } from 'react-native-appwrite';
+import { Client, Account, Storage, OAuthProvider, Databases } from 'react-native-appwrite';
 
-const client = new Client()
-    .setProject('67678ff80037c2cf1dee')
-    .setPlatform('com.ak.usider');
+let client : Client;
 
-export { OAuthProvider, Account }; 
+client = new Client()
+client
+    .setEndpoint('https://cloud.appwrite.io/v1') 
+    .setProject('67678ff80037c2cf1dee'); 
+    
+
+export { OAuthProvider, Account, Databases }; 
 const storage = new Storage(client);
 
 export const getRandomFileFromBucket = async (bucketId: string) => {

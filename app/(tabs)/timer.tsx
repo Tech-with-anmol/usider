@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useState } from 'react'
-import Timer from '@/components/timer'
 import { Ionicons } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker';
+import Stopwatch from '@/components/stopwatch';
 
 type Props = {}
 
@@ -46,7 +46,7 @@ const Page = (props: Props) => {
         <Ionicons name="refresh" size={32} color="white" />
       </TouchableOpacity>
       <View style={styles.timerContainer}>
-        <Timer paused={timerPaused} />
+        <Stopwatch paused={timerPaused} />
       </View>
     </View>
   )

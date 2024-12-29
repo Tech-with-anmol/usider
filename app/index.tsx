@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View, ImageBackground, Dimensions } from "react-native";
 import React from "react";
-import { useRouter} from "expo-router";
+import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
@@ -19,13 +19,13 @@ const Page = () => {
          resizeMode="cover"
        >
       <View style={styles.wrapper}>
-      <Animated.Text style={styles.title} entering={FadeInRight.delay(300).duration(500)}>Relax & Enjoy!</Animated.Text>
-      <Animated.Text style={styles.detailsheadphone} entering={FadeInRight.delay(700).duration(500)}>Tip: if you have headphones then be sure to use it for best experience!</Animated.Text>
-      <Animated.View entering={FadeInDown.delay(1200).duration(500)}>
-      <TouchableOpacity style={styles.btn} onPress={() => router.replace("../sign_in")}>
-        <Text style={styles.btntext}>Get Started</Text>
-      </TouchableOpacity>
-      </Animated.View> 
+        <Animated.Text style={styles.title} entering={FadeInRight.delay(300).duration(500)}>Relax & Enjoy!</Animated.Text>
+        <Animated.Text style={styles.detailsheadphone} entering={FadeInRight.delay(700).duration(500)}>Tip: if you have headphones then be sure to use it for best experience!</Animated.Text>
+        <Animated.View entering={FadeInDown.delay(1200).duration(500)}>
+          <TouchableOpacity style={styles.btn} onPress={() => router.replace("../sign_in")}>
+            <Text style={styles.btntext}>Get Started</Text>
+          </TouchableOpacity>
+        </Animated.View> 
       </View>
       </ImageBackground>
     </View>
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.03, // Responsive margin
     alignItems: 'center',
     borderRadius: 16,
+    zIndex: 1, // Ensure the button is on top
   },
   btntext: {
     fontWeight: '700',

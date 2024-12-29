@@ -5,38 +5,24 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-interface TimerProps {
+interface StopwatchProps {
   paused: boolean;
-  totalDuration: number;
-  onUpdate: (time: number) => void;
-  onEnd?: () => void; // Optional callback for when the timer ends
 }
 
-export default function Timer({ paused, totalDuration, onUpdate, onEnd }: TimerProps) {
-  const [time, setTime] = useState(totalDuration);
+export default function Stopwatch({ paused}: StopwatchProps) {
+  const [time, setTime] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const animatedSeconds = useRef(new Animated.Value(0)).current;
   const animatedMinutes = useRef(new Animated.Value(0)).current;
   const animatedHours = useRef(new Animated.Value(0)).current;
 
-  useFonts({Poppins_600SemiBold});
-
+  useFonts({Poppins_600SemiBold})
   useEffect(() => {
-    setTime(totalDuration);
-  }, [totalDuration]);
-
-  useEffect(() => {
-    if (paused || time <= 0) {
-      if (time <= 0 && onEnd) {
-        onEnd(); // Trigger the onEnd callback if provided
-      }
-      return;
-    }
+    if (paused) return;
 
     const interval = setInterval(() => {
       setTime(prevTime => {
-        const newTime = prevTime - 1;
-        onUpdate(newTime);
+        const newTime = prevTime + 1;
         Animated.timing(animatedSeconds, {
           toValue: 1,
           duration: 500,
@@ -44,7 +30,7 @@ export default function Timer({ paused, totalDuration, onUpdate, onEnd }: TimerP
         }).start(() => {
           animatedSeconds.setValue(0);
         });
-        if (newTime % 60 === 59) {
+        if (newTime % 60 === 0) {
           Animated.timing(animatedMinutes, {
             toValue: 1,
             duration: 500,
@@ -53,7 +39,7 @@ export default function Timer({ paused, totalDuration, onUpdate, onEnd }: TimerP
             animatedMinutes.setValue(0);
           });
         }
-        if (newTime % 3600 === 3599) {
+        if (newTime % 3600 === 0) {
           Animated.timing(animatedHours, {
             toValue: 1,
             duration: 500,
@@ -66,7 +52,7 @@ export default function Timer({ paused, totalDuration, onUpdate, onEnd }: TimerP
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [paused, time]);
+  }, [paused]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -105,36 +91,36 @@ export default function Timer({ paused, totalDuration, onUpdate, onEnd }: TimerP
   });
 
   const handleRestart = () => {
-    setTime(totalDuration);
+    setTime(0);
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={handleScreenTap}>
-      <View style={styles.flipContainer}>
-        <View style={styles.flipCardContainer}>
-          <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationHours }] }]}>
-            <Text style={styles.digistyle}>{hours}</Text>
-          </Animated.View>
+      <TouchableOpacity style={styles.container} onPress={handleScreenTap}>
+        <View style={styles.flipContainer}>
+          <View style={styles.flipCardContainer}>
+            <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationHours }] }]}>
+              <Text style={styles.digistyle}>{hours}</Text>
+            </Animated.View>
+          </View>
+          <Text style={styles.separatorstyle}>:</Text>
+          <View style={styles.flipCardContainer}>
+            <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationMinutes }] }]}>
+              <Text style={styles.digistyle}>{minutes}</Text>
+            </Animated.View>
+          </View>
+          <Text style={styles.separatorstyle}>:</Text>
+          <View style={styles.flipCardContainer}>
+            <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationSeconds }] }]}>
+              <Text style={styles.digistyle}>{seconds}</Text>
+            </Animated.View>
+          </View>
         </View>
-        <Text style={styles.separatorstyle}>:</Text>
-        <View style={styles.flipCardContainer}>
-          <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationMinutes }] }]}>
-            <Text style={styles.digistyle}>{minutes}</Text>
-          </Animated.View>
-        </View>
-        <Text style={styles.separatorstyle}>:</Text>
-        <View style={styles.flipCardContainer}>
-          <Animated.View style={[styles.flipCard, { transform: [{ rotateX: flipAnimationSeconds }] }]}>
-            <Text style={styles.digistyle}>{seconds}</Text>
-          </Animated.View>
-        </View>
-      </View>
-      {showControls && (
-        <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-          <Ionicons name="refresh" size={32} color="white" />
-        </TouchableOpacity>
-      )}
-    </TouchableOpacity>
+        {showControls && (
+          <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+            <Ionicons name="refresh" size={32} color="white" />
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
   )
 }
 

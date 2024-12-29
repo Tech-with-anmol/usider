@@ -20,6 +20,9 @@ const Page = (props: Props) => {
   const btn4= () => {
     router.push('../setting/4')
   }
+  const btn5= () => {
+    router.push('../setting/5')
+  }
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown : false}}/>
@@ -43,6 +46,12 @@ const Page = (props: Props) => {
       </TouchableOpacity>
       <TouchableOpacity onPress={btn4} style={styles.itembtn}>
       <Text style ={styles.itembtntxt}>Upcoming feautres</Text>
+      <MaterialIcons
+      name='arrow-forward-ios'
+      color='#fff'/>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={btn5} style={styles.itembtn}>
+      <Text style ={styles.itembtntxt}>Log Out</Text>
       <MaterialIcons
       name='arrow-forward-ios'
       color='#fff'/>
