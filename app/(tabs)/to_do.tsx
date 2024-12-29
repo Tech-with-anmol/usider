@@ -144,7 +144,9 @@ export default function ToDo() {
     };
 
     if (!fontsLoaded) {
+        <View style={styles.loadingcontainer}>
         return <ActivityIndicator size="large" color="#88C0D0" />;
+        </View>
     }
 
     return (
@@ -256,6 +258,12 @@ export default function ToDo() {
 }
 
 const styles = StyleSheet.create({
+    loadingcontainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000',
+    },
     container: {
         flex: 1,
         backgroundColor: '#2E3440',

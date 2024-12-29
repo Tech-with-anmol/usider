@@ -20,7 +20,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="timer"
+        name="stopwatch"
         options={{
           title: "Stopwatch",
         }}

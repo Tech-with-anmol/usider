@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
   restartButton: {
     marginTop: 20,
   },
-})
+});

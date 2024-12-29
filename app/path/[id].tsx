@@ -8,8 +8,7 @@ import Timer from '@/components/timer'
 import { getRandomFileFromBucket, client } from '@/lib/appwrite'
 import { Account, Databases, Query } from 'react-native-appwrite'
 import Toast from 'react-native-toast-message'
-import PushNotification from 'react-native-push-notification'
-import BackgroundTimer from 'react-native-background-timer'
+
 
 
 // Custom debounce function
@@ -102,7 +101,6 @@ const Pathsresult = () => {
       setSound(newSound);
       newSound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.isLoaded && status.didJustFinish) {
-          console.log('Playback finished. isLooping:', isLoopingRef.current);
           if (isLoopingRef.current) {
             await newSound.replayAsync();
           } else {
@@ -153,7 +151,6 @@ const Pathsresult = () => {
   const saveElapsedTime = () => {
     const elapsed = totalDuration - currentTimerTime;
     setElapsedTime(elapsed);
-    console.log('Elapsed Time:', elapsed);
   };
 
   useEffect(() => {
@@ -214,12 +211,23 @@ const Pathsresult = () => {
     debouncedSaveTimerData();
   };
 
-  const handleTimerUpdate = useCallback((time: number) => {
-    setCurrentTimerTime(time);
-    if (time <= 0) {
+  useEffect(() => {
+    if (currentTimerTime <= 0) {
       setIsNaming(true); // Show the naming modal when the timer completes
     }
-  }, []);
+
+  }, [currentTimerTime]);
+
+
+  const handleTimerUpdate = (time: number) => {
+      
+      setCurrentTimerTime(time);
+      if (time <= 0) {
+        setIsNaming(true); // Show the naming modal when the timer completes
+      }
+    
+  }
+  
 
   const handleCustomDuration = () => {
     setCustomDurationModalVisible(true);
@@ -240,42 +248,8 @@ const Pathsresult = () => {
     }
   };
 
-  useEffect(() => {
-    if (!timerPaused) {
-      BackgroundTimer.runBackgroundTimer(() => {
-        setCurrentTimerTime(prevTime => {
-          if (prevTime > 0) {
-            return prevTime - 1;
-          } else {
-            BackgroundTimer.stopBackgroundTimer();
-            return 0;
-          }
-        });
-      }, 1000);
-    } else {
-      BackgroundTimer.stopBackgroundTimer();
-    }
-
-    return () => {
-      BackgroundTimer.stopBackgroundTimer();
-    };
-  }, [timerPaused]);
-
-  useEffect(() => {
-    if (currentTimerTime > 0) {
-      PushNotification.localNotification({
-        channelId: "timer-channel",
-        title: "Timer Running",
-        message: `Time left: ${Math.floor(currentTimerTime / 60)}:${currentTimerTime % 60}`,
-        playSound: false,
-        soundName: 'default',
-        importance: 'high',
-        vibrate: false,
-      });
-    } else {
-      PushNotification.cancelAllLocalNotifications();
-    }
-  }, [currentTimerTime]);
+  
+  
 
   const renderContent = () => {
     switch (id) {

@@ -13,7 +13,7 @@ export const icon = {
     ) : (
       <Ionicons name="stats-chart-outline" size={25} color={color} />
     ),
-  timer: ({ color, focused }: { color: string; focused: boolean }) =>
+  stopwatch: ({ color, focused }: { color: string; focused: boolean }) =>
     focused ? (
       <Ionicons name="stopwatch" size={22} color={color} />
     ) : (

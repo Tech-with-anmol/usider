@@ -61,7 +61,8 @@ const StatsPage = () => {
   const fetchTimerData = async (userId: string) => {
     try {
       const response = await databases.listDocuments('67700254003a7728ac47', '6770037e0017ef452669', [
-        Query.equal('userId', userId)
+        Query.equal('userId', userId),
+        Query.orderDesc('$createdAt') // Ensure the latest data is fetched
       ]);
       setTimerData(response.documents);
       calculateTotalTime(response.documents);
@@ -81,7 +82,8 @@ const StatsPage = () => {
   const fetchPathSelectionData = async (userId: string) => {
     try {
       const response = await databases.listDocuments('67700254003a7728ac47', '67712065003e44192265', [
-        Query.equal('userId', userId)
+        Query.equal('userId', userId),
+        Query.orderDesc('$createdAt') // Ensure the latest data is fetched
       ]);
       const pathData = response.documents.reduce((acc: { [key: string]: number }, doc: any) => {
         acc[doc.pathId] = (acc[doc.pathId] || 0) + 1;
