@@ -8,6 +8,9 @@ import Timer from '@/components/timer'
 import { getRandomFileFromBucket, client } from '@/lib/appwrite'
 import { Account, Databases, Query } from 'react-native-appwrite'
 import Toast from 'react-native-toast-message'
+import PushNotification from 'react-native-push-notification'
+import BackgroundTimer from 'react-native-background-timer'
+
 
 // Custom debounce function
 const debounce = (func: (...args: any[]) => void, delay: number) => {
@@ -55,9 +58,6 @@ const Pathsresult = () => {
     };
     getUser();
   }, []);
-
-  
-   
 
   useFocusEffect(
     React.useCallback(() => {
@@ -163,22 +163,8 @@ const Pathsresult = () => {
   const saveTimerData = async () => {
     saveElapsedTime(); // Ensure elapsed time is saved before storing in the database
 
-    if (!userId) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'User not found',
-      });
-      return;
-    }
-
     if (!timerName.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Timer name cannot be empty',
-      });
-      return;
+      return; // Do not show toast here
     }
 
     try {
@@ -228,12 +214,12 @@ const Pathsresult = () => {
     debouncedSaveTimerData();
   };
 
-  const handleTimerUpdate = (time: number) => {
+  const handleTimerUpdate = useCallback((time: number) => {
     setCurrentTimerTime(time);
     if (time <= 0) {
       setIsNaming(true); // Show the naming modal when the timer completes
     }
-  };
+  }, []);
 
   const handleCustomDuration = () => {
     setCustomDurationModalVisible(true);
@@ -253,7 +239,44 @@ const Pathsresult = () => {
       setCustomDurationModalVisible(false);
     }
   };
- 
+
+  useEffect(() => {
+    if (!timerPaused) {
+      BackgroundTimer.runBackgroundTimer(() => {
+        setCurrentTimerTime(prevTime => {
+          if (prevTime > 0) {
+            return prevTime - 1;
+          } else {
+            BackgroundTimer.stopBackgroundTimer();
+            return 0;
+          }
+        });
+      }, 1000);
+    } else {
+      BackgroundTimer.stopBackgroundTimer();
+    }
+
+    return () => {
+      BackgroundTimer.stopBackgroundTimer();
+    };
+  }, [timerPaused]);
+
+  useEffect(() => {
+    if (currentTimerTime > 0) {
+      PushNotification.localNotification({
+        channelId: "timer-channel",
+        title: "Timer Running",
+        message: `Time left: ${Math.floor(currentTimerTime / 60)}:${currentTimerTime % 60}`,
+        playSound: false,
+        soundName: 'default',
+        importance: 'high',
+        vibrate: false,
+      });
+    } else {
+      PushNotification.cancelAllLocalNotifications();
+    }
+  }, [currentTimerTime]);
+
   const renderContent = () => {
     switch (id) {
       case '1':
@@ -366,6 +389,14 @@ const Pathsresult = () => {
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.savebtn} onPress={() => {
+              if (!timerName.trim()) {
+                Toast.show({
+                  type: 'error',
+                  text1: 'Error',
+                  text2: 'Timer name cannot be empty',
+                });
+                return;
+              }
               setIsNaming(false);
               setTimerPaused(false);
               setElapsedTime(totalDuration - currentTimerTime); // Ensure elapsed time is set correctly
@@ -503,10 +534,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     borderWidth: 3,
-    borderColor: 'rgba(36, 177, 118, 0.8)',
+    borderColor: 'rgba(36, 189, 125, 0.8)',
   },
   savebtntxt: {
-    color: 'rgba(253, 250, 250, 0.8)',
+    color: 'rgb(248, 250, 249)',
     fontWeight: '500',
   },
+
 })

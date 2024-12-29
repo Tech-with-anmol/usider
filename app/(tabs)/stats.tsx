@@ -223,7 +223,7 @@ const StatsPage = () => {
           }}
           fromZero
           showValuesOnTopOfBars
-          verticalLabelRotation={20}
+          verticalLabelRotation={0}
           style={{
             marginVertical: 8,
             borderRadius: 16

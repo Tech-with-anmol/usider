@@ -31,7 +31,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         position: 'absolute',
         backgroundColor: Colors.tint,
         top: 52,
-        left: Dimensions.get('window').width / state.routes.length / 2 - 15,
+        left: buttonWidth / 2 - 15,
         height: 8,
         width: 30,
       }]} />
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: 16,
     paddingBottom: 20,
-    backgroundColor: 'rgba(92, 74, 51, 0.4)',
+    backgroundColor: 'rgba(92, 74, 51, 0.14)',
     borderRadius:25,
     marginBottom: 10,
     position:'absolute',

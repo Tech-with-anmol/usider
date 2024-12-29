@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, TextInput, Linking } from 'react-native'
+import React, { useState } from 'react'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ const Settingsnav = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const account = new Account(client);
+    const [feedback, setFeedback] = useState('');
 
     const handleLogout = async () => {
         try {
@@ -31,6 +32,31 @@ const Settingsnav = () => {
         }
     };
 
+    const handleSendFeedback = () => {
+        const email = 'mr.curious1st@gmail.com';
+        const subject = 'App Feedback';
+        const body = feedback;
+        const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        Linking.openURL(mailtoUrl)
+            .then(() => {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Feedback Sent',
+                    text2: 'Thank you for your feedback!',
+                });
+                setFeedback('');
+            })
+            .catch((error) => {
+                console.error('Error sending feedback:', error);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Failed to send feedback',
+                });
+            });
+    };
+
     const renderContents = () => {
         switch (id) {
             case '1':
@@ -44,9 +70,18 @@ const Settingsnav = () => {
             case '2':
                 return (
                     <View style={styles.contactContainer}>
-                        <Text style={styles.contactText}>Drop me your suggestions at:</Text>
-                        <Text style={styles.contactEmail}>📧 : anmollklfh@gmail.com</Text>
-                        <Text style={styles.contactNote}>💡 : I will try to reply to your email asap.</Text>
+                        <Text style={styles.contactText}>We value your feedback!</Text>
+                        <TextInput
+                            style={styles.feedbackInput}
+                            placeholder="Write your feedback here..."
+                            placeholderTextColor="#888"
+                            value={feedback}
+                            onChangeText={setFeedback}
+                            multiline
+                        />
+                        <TouchableOpacity style={styles.sendButton} onPress={handleSendFeedback}>
+                            <Text style={styles.sendButtonText}>Send Feedback</Text>
+                        </TouchableOpacity>
                     </View>
                 );
             case '3':
@@ -58,13 +93,10 @@ const Settingsnav = () => {
                             <Text style={styles.features}>Upcoming Features</Text>
                             <Text style={styles.contactText}>ETA : End of January with exception for some features</Text>
                             <View style={styles.listContainer}>
-                                <Text style={styles.listItem}>1. Stats for your timer and usage</Text>
-                                <Text style={styles.listItem}>2. Custom path</Text>
-                                <Text style={styles.listItem}>3. Your own background and music</Text>
-                                <Text style={styles.listItem}>4. AI generated path</Text>
-                                <Text style={styles.listItem}>5. Chart for timer and in-depth analysis</Text>
-                                <Text style={styles.listItem}>6. Tagging for each timer to organize it</Text>
-                                <Text style={styles.listItem}>7. And many more</Text>
+                                <Text style={styles.listItem}>1. Custom path</Text>
+                                <Text style={styles.listItem}>2. Your own background and music</Text>
+                                <Text style={styles.listItem}>3. AI generated path</Text>
+                                <Text style={styles.listItem}>4. And many more</Text>
                             </View>
                         </View>
                     </ScrollView>
@@ -152,6 +184,27 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: '#1e1e2e',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  feedbackInput: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#3B4252',
+    color: '#D8DEE9',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+    fontFamily: 'Poppins_400Regular',
+    textAlignVertical: 'top',
+  },
+  sendButton: {
+    backgroundColor: '#88C0D0',
+    padding: 15,
+    borderRadius: 8,
+  },
+  sendButtonText: {
+    color: '#2E3440',
     fontSize: 18,
     fontWeight: '600',
   },
