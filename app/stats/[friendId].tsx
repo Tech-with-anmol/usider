@@ -1,13 +1,13 @@
-import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Account, Databases, Query } from 'react-native-appwrite';
+import { Databases, Query } from 'react-native-appwrite';
 import { client } from '@/lib/appwrite';
 import Toast from 'react-native-toast-message';
-import { useFocusEffect } from '@react-navigation/native';
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import NetInfo from '@react-native-community/netinfo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 const pathNames: { [key: string]: string } = {
   '1': 'Lo-fi',
@@ -16,39 +16,29 @@ const pathNames: { [key: string]: string } = {
 
 const pieChartColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
-const StatsPage = () => {
+const FriendStatsPage = () => {
+  const { friendId } = useLocalSearchParams<{ friendId: string }>();
   const [timerData, setTimerData] = useState<any[]>([]);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [todayTime, setTodayTime] = useState<number>(0);
-  const [userId, setUserId] = useState<string | null>(null);
   const [chartData, setChartData] = useState<{ labels: string[], datasets: { data: number[], formattedData: string[] }[] }>({ labels: [], datasets: [{ data: [], formattedData: [] }] });
   const [pathSelectionData, setPathSelectionData] = useState<{ name: string, count: number, percentage: number, color: string }[]>([]);
   const [barChartData, setBarChartData] = useState<{ labels: string[], datasets: { data: number[] }[] }>({ labels: [], datasets: [{ data: [] }] });
   const [isOnline, setIsOnline] = useState<boolean>(true);
+  const router = useRouter();
 
   let [fontsLoaded] = useFonts({
     Poppins_600SemiBold,
   });
 
-  const account = new Account(client);
   const databases = new Databases(client);
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const user = await account.get();
-        setUserId(user.$id);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Failed to fetch user data',
-        });
-      }
-    };
-    getUser();
-  }, []);
+    if (friendId) {
+      fetchTimerData(friendId);
+      fetchPathSelectionData(friendId);
+    }
+  }, [friendId]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -58,79 +48,8 @@ const StatsPage = () => {
       };
 
       checkInternetConnection();
-
-      if (userId && isOnline) {
-        syncDataToCloud(userId);
-      } else if (!isOnline) {
-        fetchOfflineData();
-        Toast.show({
-          type: 'error',
-          text1: 'No Internet Connection',
-          text2: 'Showing offline data',
-        });
-      }
-    }, [userId, isOnline])
+    }, [])
   );
-
-  const syncDataToCloud = async (userId: string) => {
-    console.log('syncDataToCloud called');
-    try {
-      const offlineData = await AsyncStorage.getItem('timerData');
-      console.log('Data from AsyncStorage:', offlineData);
-      if (offlineData) {
-        const parsedData = JSON.parse(offlineData);
-        if (Array.isArray(parsedData)) {
-          for (const doc of parsedData) {
-            await databases.createDocument('67700254003a7728ac47', '6770037e0017ef452669', 'unique()', {
-              userId,
-              timerName: doc.timerName,
-              totalTime: doc.totalTime,
-            });
-            console.log('Synced data to cloud:', doc);
-          }
-        } else {
-          await databases.createDocument('67700254003a7728ac47', '6770037e0017ef452669', 'unique()', {
-            userId,
-            timerName: parsedData.timerName,
-            totalTime: parsedData.totalTime,
-          });
-          console.log('Synced data to cloud:', parsedData);
-        }
-        await AsyncStorage.removeItem('timerData');
-      }
-      fetchTimerData(userId);
-      fetchPathSelectionData(userId);
-    } catch (error) {
-      console.error('Error syncing data to cloud:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to sync data to cloud',
-      });
-    }
-  };
-
-  const fetchOfflineData = async () => {
-    try {
-      const offlineData = await AsyncStorage.getItem('timerData');
-      console.log('Data from AsyncStorage:', offlineData);
-      if (offlineData) {
-        const parsedData = JSON.parse(offlineData);
-        setTimerData(Array.isArray(parsedData) ? parsedData : [parsedData]);
-        calculateTotalTime(parsedData);
-        calculateTodayTime(parsedData);
-        calculateChartData(parsedData);
-        calculateBarChartData(parsedData);
-      }
-    } catch (error) {
-      console.error('Error fetching offline data:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to fetch offline data',
-      });
-    }
-  };
 
   const fetchTimerData = async (userId: string) => {
     try {
@@ -269,128 +188,135 @@ const StatsPage = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Your Timer Stats</Text>
-      <View style={styles.chartContainer}>
-        <BarChart
-          data={{
-            labels: chartData.labels,
-            datasets: [{ data: chartData.datasets[0].data }]
-          }}
-          width={Dimensions.get('window').width - 40}
-          height={270}
-          yAxisLabel=""
-          yAxisSuffix=""
-          chartConfig={{
-            backgroundColor: '#1e1e2e',
-            backgroundGradientFrom: '#1e1e2e',
-            backgroundGradientTo: '#1e1e2e',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Text></Text>
+      <Text></Text>
+      <Text></Text>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="chevron-back" size={24} color="white" />
+      </TouchableOpacity>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.title}>Friend's Timer Stats</Text>
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={{
+              labels: chartData.labels,
+              datasets: [{ data: chartData.datasets[0].data }]
+            }}
+            width={Dimensions.get('window').width - 40}
+            height={270}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={{
+              backgroundColor: '#1e1e2e',
+              backgroundGradientFrom: '#1e1e2e',
+              backgroundGradientTo: '#1e1e2e',
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16
+              },
+              propsForDots: {
+                r: '6',
+                strokeWidth: '2',
+                stroke: '#ffa726'
+              }
+            }}
+            fromZero
+            showValuesOnTopOfBars
+            verticalLabelRotation={0}
+            style={{
+              marginVertical: 8,
               borderRadius: 16
-            },
-            propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726'
-            }
-          }}
-          fromZero
-          showValuesOnTopOfBars
-          verticalLabelRotation={0}
-          style={{
-            marginVertical: 8,
-            borderRadius: 16
-          }}
-        />
-      </View>
-      <Text style={styles.todayTimeText}>Total Time Spent Today: {formatTime(todayTime)}</Text>
-      <View style={styles.chartContainer}>
-        <PieChart
-          data={pathSelectionData.map(item => ({
-            name: `${item.name}: ${item.percentage}%`,
-            population: item.count,
-            color: item.color,
-            legendFontColor: '#cdd6f4',
-            legendFontSize: 15
-          }))}
-          width={Dimensions.get('window').width - 40}
-          height={220}
-          chartConfig={{
-            backgroundColor: '#1e1e2e',
-            backgroundGradientFrom: '#1e1e2e',
-            backgroundGradientTo: '#1e1e2e',
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          }}
-          accessor="population"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
-        />
-      </View>
-      
-      <View style={styles.chartContainer}>
-        <BarChart
-          data={{
-            labels: barChartData.labels,
-            datasets: [{ data: barChartData.datasets[0].data }]
-          }}
-          width={Dimensions.get('window').width - 40}
-          height={270}
-          yAxisLabel=""
-          yAxisSuffix=""
-          chartConfig={{
-            backgroundColor: '#1e1e2e',
-            backgroundGradientFrom: '#1e1e2e',
-            backgroundGradientTo: '#1e1e2e',
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
+            }}
+          />
+        </View>
+        <Text style={styles.todayTimeText}>Total Time Spent Today: {formatTime(todayTime)}</Text>
+        <View style={styles.chartContainer}>
+          <PieChart
+            data={pathSelectionData.map(item => ({
+              name: `${item.name}: ${item.percentage}%`,
+              population: item.count,
+              color: item.color,
+              legendFontColor: '#cdd6f4',
+              legendFontSize: 15
+            }))}
+            width={Dimensions.get('window').width - 40}
+            height={220}
+            chartConfig={{
+              backgroundColor: '#1e1e2e',
+              backgroundGradientFrom: '#1e1e2e',
+              backgroundGradientTo: '#1e1e2e',
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            }}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        </View>
+        
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={{
+              labels: barChartData.labels,
+              datasets: [{ data: barChartData.datasets[0].data }]
+            }}
+            width={Dimensions.get('window').width - 40}
+            height={270}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={{
+              backgroundColor: '#1e1e2e',
+              backgroundGradientFrom: '#1e1e2e',
+              backgroundGradientTo: '#1e1e2e',
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16
+              },
+              propsForDots: {
+                r: '6',
+                strokeWidth: '2',
+                stroke: '#ffa726'
+              }
+            }}
+            fromZero
+            showValuesOnTopOfBars
+            verticalLabelRotation={20}
+            style={{
+              marginVertical: 8,
               borderRadius: 16
-            },
-            propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726'
-            }
-          }}
-          fromZero
-          showValuesOnTopOfBars
-          verticalLabelRotation={20}
-          style={{
-            marginVertical: 8,
-            borderRadius: 16
-          }}
-        />
-      </View>
-      <Text style={styles.totalTimeText}>Total Time Spent: {formatTime(totalTime)}</Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Text></Text>
-      <Toast />
-    </ScrollView>
-  )
-}
+            }}
+          />
+        </View>
+        <Text style={styles.totalTimeText}>Total Time Spent: {formatTime(totalTime)}</Text>
+        <Toast />
+      </ScrollView>
+    </View>
+  );
+};
 
-export default StatsPage
+export default FriendStatsPage;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1e1e2e',
     padding: 20,
-    
+  },
+  scrollView: {
+    flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 1,
   },
   title: {
     fontSize: 24,
@@ -443,4 +369,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
   },
-})
+});

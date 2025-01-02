@@ -5,7 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useFonts, DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import * as Splashscreen from 'expo-splash-screen';
 import { Link, router, useFocusEffect } from 'expo-router';
-import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Account, Databases, Query } from 'react-native-appwrite';
 import { client, streakCollectionId } from '@/lib/appwrite';
@@ -23,7 +23,6 @@ export default function Homescreen() {
     const [loading, setLoading] = useState(true);
     const [userId, setUserId] = useState<string | null>(null);
     const [streak, setStreak] = useState<number>(0);
-    const [showStreakAnimation, setShowStreakAnimation] = useState<boolean>(false);
     
     const btnn = async () => {
       setBgColor1(bgColor1 === '#255411' ? 'transparent' : '#255411');
@@ -96,7 +95,6 @@ export default function Homescreen() {
               lastLoginDate: new Date().toISOString()
             });
             setStreak(newStreak);
-            setShowStreakAnimation(true);
           }
         } else {
           await databases.createDocument('67700254003a7728ac47', streakCollectionId, 'unique()', {
@@ -105,7 +103,6 @@ export default function Homescreen() {
             lastLoginDate: new Date().toISOString()
           });
           setStreak(1);
-          setShowStreakAnimation(true);
         }
       } catch (error) {
         console.error('Error updating streak:', error);
@@ -126,29 +123,6 @@ export default function Homescreen() {
       }, [])
     );
 
-    const streakPosition = useSharedValue({ top: 20, right: 20 });
-    const streakScale = useSharedValue(1);
-
-    useEffect(() => {
-      if (showStreakAnimation) {
-        streakPosition.value = withTiming({ top: height / 2 - 50, right: width / 2 - 75 }, { duration: 1000, easing: Easing.out(Easing.exp) });
-        streakScale.value = withTiming(2, { duration: 1000, easing: Easing.out(Easing.exp) }, () => {
-          setTimeout(() => {
-            streakPosition.value = withTiming({ top: 20, right: 20 }, { duration: 1000, easing: Easing.in(Easing.exp) });
-            streakScale.value = withTiming(1, { duration: 1000, easing: Easing.in(Easing.exp) });
-          }, 2000);
-        });
-      }
-    }, [showStreakAnimation]);
-
-    const animatedStreakStyle = useAnimatedStyle(() => {
-      return {
-        top: streakPosition.value.top,
-        right: streakPosition.value.right,
-        transform: [{ scale: streakScale.value }],
-      };
-    });
-
     if (loading) {
         return (
           <View style={styles.loadingContainer}>
@@ -165,10 +139,10 @@ export default function Homescreen() {
         <SafeAreaView style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.title}>Paths</Text>
-            <Animated.View style={[styles.streakContainer, animatedStreakStyle]}>
+            <View style={styles.streakContainer}>
               <Ionicons name="flame" size={24} color="orange" />
               <Text style={styles.streakText}>{streak}</Text>
-            </Animated.View>
+            </View>
             <View style={styles.svgWrapper}>
               <Svg
                 viewBox="0 0 300 300"
@@ -242,6 +216,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     position: 'absolute',
+    top: 20,
+    right: 20,
   },
   streakText: {
     color: 'orange',

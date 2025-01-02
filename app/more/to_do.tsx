@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert } from 'react-native';
+import { Platform, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert, KeyboardAvoidingView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Poppins_500Medium, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { ActivityIndicator } from 'react-native';
+import { ScrollView } from 'react-native';
 
 export default function ToDo() {
-    const [task, setTask] = useState('');
+    const [task, setTask] = useState<{ [key: string]: string }>({});
     const [tasks, setTasks] = useState<Task[]>([]);
     const [sections, setSections] = useState<Section[]>([]);
     const [editTaskId, setEditTaskId] = useState<string | null>(null);
@@ -67,14 +68,14 @@ export default function ToDo() {
     };
 
     const addTask = (sectionId: string) => {
-        if (task.trim()) {
-            const newTask = { id: Date.now().toString(), text: task, completed: false };
+        if (task[sectionId]?.trim()) {
+            const newTask = { id: Date.now().toString(), text: task[sectionId], completed: false };
             const newSections = sections.map(section => 
                 section.id === sectionId ? { ...section, tasks: [...section.tasks, newTask] } : section
             );
             setSections(newSections);
             saveSections(newSections);
-            setTask('');
+            setTask(prev => ({ ...prev, [sectionId]: '' }));
         }
     };
 
@@ -149,111 +150,122 @@ export default function ToDo() {
         </View>
     }
 
+    const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>To-Do List</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Add a new section"
-                placeholderTextColor="#888"
-                value={newSectionName}
-                onChangeText={setNewSectionName}
-            />
-            <TouchableOpacity style={styles.addButton} onPress={addSection}>
-                <Text style={styles.addButtonText}>Add Section</Text>
-            </TouchableOpacity>
-            <FlatList
-                data={sections}
-                keyExtractor={item => item.id}
-                renderItem={({ item: section }) => (
-                    <View style={styles.sectionWrapper}>
-                        <View style={[styles.sectionColorStripe, { backgroundColor: section.color }]} />
-                        <View style={styles.sectionContainer}>
-                            <View style={styles.sectionHeader}>
-                                <Text style={styles.sectionTitle}>{section.name}</Text>
-                                <TouchableOpacity onPress={() => deleteSection(section.id)}>
-                                    <Text style={styles.deleteButton}>Delete Section</Text>
+        
+            <View style={styles.container}>
+                <Text style={styles.title}>To-Do List</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Add a new section"
+                    placeholderTextColor="#888"
+                    value={newSectionName}
+                    onChangeText={setNewSectionName}
+                />
+                <TouchableOpacity style={styles.addButton} onPress={addSection}>
+                    <Text style={styles.addButtonText}>Add Section</Text>
+                </TouchableOpacity>
+                <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={keyboardVerticalOffset}
+        >
+                <FlatList
+                    data={sections}
+                    keyExtractor={item => item.id}
+                    ListHeaderComponent={<View style={{ height: 20 }} />}
+                    renderItem={({ item: section }) => (
+                        <View style={styles.sectionWrapper}>
+                            <View style={[styles.sectionColorStripe, { backgroundColor: section.color }]} />
+                            <View style={styles.sectionContainer}>
+                                <View style={styles.sectionHeader}>
+                                    <Text style={styles.sectionTitle}>{section.name}</Text>
+                                    <TouchableOpacity onPress={() => deleteSection(section.id)}>
+                                        <Text style={styles.deleteButton}>Delete Section</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Add a new task"
+                                    placeholderTextColor="#888"
+                                    value={task[section.id] || ''}
+                                    onChangeText={(text) => setTask(prev => ({ ...prev, [section.id]: text }))}
+                                />
+                                <TouchableOpacity style={styles.addButton} onPress={() => addTask(section.id)}>
+                                    <Text style={styles.addButtonText}>Add Task</Text>
                                 </TouchableOpacity>
+                                {section.tasks.filter(task => !task.completed).length > 0 && (
+                                    <Text style={styles.sectionSubTitle}>Tasks</Text>
+                                )}
+                                <FlatList
+                                    data={section.tasks.filter(task => !task.completed)}
+                                    keyExtractor={item => item.id}
+                                    renderItem={({ item }) => (
+                                        <View style={styles.taskContainer}>
+                                            <TouchableOpacity onPress={() => toggleTaskCompletion(section.id, item.id)}>
+                                                <View style={[styles.circle, item.completed && styles.completedCircle]} />
+                                            </TouchableOpacity>
+                                            <Text style={styles.taskText}>{item.text}</Text>
+                                            <View style={styles.taskActions}>
+                                                <TouchableOpacity onPress={() => startEditingTask(item.id, item.text)}>
+                                                    <Text style={styles.editButton}>Edit</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => deleteTask(section.id, item.id)}>
+                                                    <Text style={styles.deleteButton}>X</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    )}
+                                />
+                                {section.tasks.filter(task => task.completed).length > 0 && (
+                                    <Text style={styles.sectionSubTitle}>Completed</Text>
+                                )}
+                                <FlatList
+                                    data={section.tasks.filter(task => task.completed)}
+                                    keyExtractor={item => item.id}
+                                    renderItem={({ item }) => (
+                                        <View style={styles.taskContainer}>
+                                            <TouchableOpacity onPress={() => toggleTaskCompletion(section.id, item.id)}>
+                                                <View style={[styles.circle, item.completed && styles.completedCircle]} />
+                                            </TouchableOpacity>
+                                            <Text style={[styles.taskText, styles.completedTaskText]}>
+                                                {item.text}
+                                            </Text>
+                                            <View style={styles.taskActions}>
+                                                <TouchableOpacity onPress={() => deleteTask(section.id, item.id)}>
+                                                    <Text style={styles.deleteButton}>X</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    )}
+                                />
                             </View>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Add a new task"
-                                placeholderTextColor="#888"
-                                value={task}
-                                onChangeText={setTask}
-                            />
-                            <TouchableOpacity style={styles.addButton} onPress={() => addTask(section.id)}>
-                                <Text style={styles.addButtonText}>Add Task</Text>
-                            </TouchableOpacity>
-                            {section.tasks.filter(task => !task.completed).length > 0 && (
-                                <Text style={styles.sectionSubTitle}>Tasks</Text>
-                            )}
-                            <FlatList
-                                data={section.tasks.filter(task => !task.completed)}
-                                keyExtractor={item => item.id}
-                                renderItem={({ item }) => (
-                                    <View style={styles.taskContainer}>
-                                        <TouchableOpacity onPress={() => toggleTaskCompletion(section.id, item.id)}>
-                                            <View style={[styles.circle, item.completed && styles.completedCircle]} />
-                                        </TouchableOpacity>
-                                        <Text style={styles.taskText}>{item.text}</Text>
-                                        <View style={styles.taskActions}>
-                                            <TouchableOpacity onPress={() => startEditingTask(item.id, item.text)}>
-                                                <Text style={styles.editButton}>Edit</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => deleteTask(section.id, item.id)}>
-                                                <Text style={styles.deleteButton}>X</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                )}
-                            />
-                            {section.tasks.filter(task => task.completed).length > 0 && (
-                                <Text style={styles.sectionSubTitle}>Completed</Text>
-                            )}
-                            <FlatList
-                                data={section.tasks.filter(task => task.completed)}
-                                keyExtractor={item => item.id}
-                                renderItem={({ item }) => (
-                                    <View style={styles.taskContainer}>
-                                        <TouchableOpacity onPress={() => toggleTaskCompletion(section.id, item.id)}>
-                                            <View style={[styles.circle, item.completed && styles.completedCircle]} />
-                                        </TouchableOpacity>
-                                        <Text style={[styles.taskText, styles.completedTaskText]}>
-                                            {item.text}
-                                        </Text>
-                                        <View style={styles.taskActions}>
-                                            <TouchableOpacity onPress={() => deleteTask(section.id, item.id)}>
-                                                <Text style={styles.deleteButton}>X</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                )}
-                            />
                         </View>
+                    )}
+                />
+                </KeyboardAvoidingView>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={editTaskId !== null}
+                    onRequestClose={() => setEditTaskId(null)}
+                >
+                    <View style={styles.modalView}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Edit task"
+                            placeholderTextColor="#888"
+                            value={editTaskText}
+                            onChangeText={setEditTaskText}
+                        />
+                        <TouchableOpacity style={styles.addButton} onPress={saveEditedTask}>
+                            <Text style={styles.addButtonText}>Save</Text>
+                        </TouchableOpacity>
                     </View>
-                )}
-            />
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={editTaskId !== null}
-                onRequestClose={() => setEditTaskId(null)}
-            >
-                <View style={styles.modalView}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Edit task"
-                        placeholderTextColor="#888"
-                        value={editTaskText}
-                        onChangeText={setEditTaskText}
-                    />
-                    <TouchableOpacity style={styles.addButton} onPress={saveEditedTask}>
-                        <Text style={styles.addButtonText}>Save</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal>
-        </View>
+                </Modal>
+            </View>
+        
     );
 }
 

@@ -20,9 +20,9 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="stopwatch"
+        name="more"
         options={{
-          title: "Stopwatch",
+          title: "More",
         }}
       />
       <Tabs.Screen
@@ -31,11 +31,7 @@ const TabLayout = () => {
           title: "Settings",
         }}
       />
-      <Tabs.Screen
-        name="to_do"
-        options={{
-          title: "To-Do",
-        }}/>
+      
     </Tabs>
   )
 }

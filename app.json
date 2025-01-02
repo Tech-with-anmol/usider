@@ -20,7 +20,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-sqlite"
+      "expo-sqlite",
+      "react-native-background-fetch"
     ],
     "experiments": {
       "typedRoutes": true
@@ -35,6 +36,10 @@
     },
     "developmentClient": {
       "silentLaunch": false
+    },
+    "android": {
+      "package": "com.ak.usider",
+      "softwareKeyboardLayoutMode": "pan"
     }
   }
 }

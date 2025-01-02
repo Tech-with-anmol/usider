@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
-import { Account, OAuthProvider } from 'react-native-appwrite';
+import { Account } from 'react-native-appwrite';
 import { client } from '../lib/appwrite';
 import { AntDesign } from '@expo/vector-icons'; // Import AntDesign for Google icon
 import Toast from 'react-native-toast-message';
+import { Ionicons } from '@expo/vector-icons';
 
 const SignUpScreen = () => {
     let [fontsLoaded] = useFonts({
@@ -16,6 +17,7 @@ const SignUpScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isChecked, setIsChecked] = useState(false);
 
     const account = new Account(client);
     const router = useRouter();
@@ -48,6 +50,15 @@ const SignUpScreen = () => {
             return;
         }
 
+        if (!isChecked) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'You must agree to the privacy policy and terms & conditions',
+            });
+            return;
+        }
+
         try {
             await account.create('unique()', email, password, name);
             Toast.show({
@@ -66,65 +77,85 @@ const SignUpScreen = () => {
         }
     };
 
-
     if (!fontsLoaded) {
         return null; // or a loading spinner
     }
 
     return (
-        <View style={styles.container}>
-            <Stack.Screen options={{ headerShown: false}}/>
-            <Image 
-            source={require('../assets/images/icon.png')}
-            style={styles.logo}
-            />
-            <Text style={styles.title}>Welcome</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Name"
-                placeholderTextColor="#cdd6f4"
-                value={name}
-                onChangeText={setName}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#cdd6f4"
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#cdd6f4"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Confirm Password"
-                placeholderTextColor="#cdd6f4"
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                <Text style={styles.buttonText}>Sign up</Text>
-            </TouchableOpacity>
-            <View style={styles.signInContainer}>
-                <Text style={styles.signInText}>Already have an account?</Text>
-                <TouchableOpacity onPress={() => router.replace('../sign_in')}>
-                    <Text style={styles.signInButton}>Sign in</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.container}>
+                <Stack.Screen options={{ headerShown: false}}/>
+                <Image 
+                source={require('../assets/images/icon.png')}
+                style={styles.logo}
+                />
+                <Text style={styles.title}>Welcome</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Name"
+                    placeholderTextColor="#cdd6f4"
+                    value={name}
+                    onChangeText={setName}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="#cdd6f4"
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="#cdd6f4"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="#cdd6f4"
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                />
+                <View style={styles.checkboxContainer}>
+                    <TouchableOpacity onPress={() => setIsChecked(!isChecked)} style={styles.checkbox}>
+                        {isChecked && <Ionicons name="checkmark" size={20} color="white" />}
+                    </TouchableOpacity>
+                    <Text style={styles.checkboxLabel}>
+                        I agree to the{' '}
+                        <Text style={styles.link} onPress={() => router.push('../setting/3')}>
+                            Privacy Policy
+                        </Text>{' '}
+                        and{' '}
+                        <Text style={styles.link} onPress={() => router.push('../setting/3')}>
+                            Terms & Conditions
+                        </Text>
+                    </Text>
+                </View>
+                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                    <Text style={styles.buttonText}>Sign up</Text>
                 </TouchableOpacity>
+                <View style={styles.signInContainer}>
+                    <Text style={styles.signInText}>Already have an account?</Text>
+                    <TouchableOpacity onPress={() => router.replace('../sign_in')}>
+                        <Text style={styles.signInButton}>Sign in</Text>
+                    </TouchableOpacity>
+                </View>
+                <Toast />
             </View>
-            <Toast />
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
     container: {
         flex: 1,
         backgroundColor: '#1e1e2e',
@@ -152,6 +183,28 @@ const styles = StyleSheet.create({
         color: '#cdd6f4',
         marginBottom: 20,
         fontSize: 16,
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: '#cdd6f4',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    checkboxLabel: {
+        color: '#cdd6f4',
+        fontSize: 14,
+    },
+    link: {
+        color: '#f38ba8',
+        textDecorationLine: 'underline',
     },
     button: {
         height: 50,
