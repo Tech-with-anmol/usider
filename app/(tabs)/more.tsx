@@ -111,7 +111,7 @@ const More = () => {
         
       </View>
 
-      <Text style={styles.tiptext}>Note : This is intial version of app, so there can be bugs, be sure to report them to us! and lot of features are coming soon!</Text>
+      <Text style={styles.tiptext}>📔 : This is intial version of app, so there can be bugs, be sure to report them to us! and lot of features are coming soon!</Text>
     </View>
   );
 };
