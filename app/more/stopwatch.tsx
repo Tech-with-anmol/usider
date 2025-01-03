@@ -3,12 +3,14 @@ import React, { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker';
 import Stopwatch from '@/components/stopwatch';
+import { Stack, useRouter } from 'expo-router';
 
 type Props = {}
 
 const { width, height } = Dimensions.get('window');
 
 const Page = (props: Props) => {
+  const router = useRouter();
   const [timerPaused, setTimerPaused] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('rgb(179, 151, 110)');
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -28,6 +30,10 @@ const Page = (props: Props) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      <Stack.Screen options={{headerShown: false}}/> 
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={32} color="white" />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.timerControl} onPress={handleTimerPause}>
         <Ionicons name={timerPaused ? "play" : "pause"} size={32} color="white" />
       </TouchableOpacity>
@@ -65,7 +71,7 @@ const styles = StyleSheet.create({
   timerControl: {
     position: 'absolute',
     top: height * 0.05,
-    left: width * 0.05,
+    left: width * 0.13,
   },
   colorControl: {
     position: 'absolute',
@@ -89,5 +95,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  backButton: {
+    position: 'absolute',
+    top: height * 0.05,
+    left: width * 0.05,
+    zIndex: 1,
+  
   },
 })

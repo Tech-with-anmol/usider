@@ -67,7 +67,7 @@ const Pathsresult = () => {
       const file: any = await getRandomFileFromBucket(bucketId);
       setRandomFile({ url: file.url });
     } catch (error) {
-      console.error('Error fetching random file:', error);
+      
     }
   };
 
@@ -88,7 +88,7 @@ const Pathsresult = () => {
       });
       await newSound.playAsync();
     } catch (error) {
-      console.error('Error fetching random music:', error);
+      
     }
   };
 
@@ -131,7 +131,7 @@ const Pathsresult = () => {
     setElapsedTime(elapsed);
     if (timerName.trim() && elapsed > 0) {
       const timerData = { timerName, totalTime: elapsed };
-      console.log('Saving timer data to AsyncStorage:', timerData);
+    
       await AsyncStorage.setItem('timerData', JSON.stringify(timerData));
     }
   };

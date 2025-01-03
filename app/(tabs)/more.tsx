@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFonts, Poppins_500Medium } from '@expo-google-fonts/poppins';
 
 const More = () => {
   const router = useRouter();
@@ -11,7 +12,10 @@ const More = () => {
   const ropeAnim1 = useRef(new Animated.Value(0)).current;
   const ropeAnim2 = useRef(new Animated.Value(0)).current;
   const ropeAnim3 = useRef(new Animated.Value(0)).current;
-
+ 
+  const [loaded, error] = useFonts({
+     Poppins_500Medium
+  })
   useEffect(() => {
     const swing = (anim: Animated.Value) => {
       Animated.sequence([
@@ -102,8 +106,12 @@ const More = () => {
               <Text style={styles.circleText}>To-Do</Text>
             </TouchableOpacity>
           </Animated.View>
+          
         </View>
+        
       </View>
+
+      <Text style={styles.tiptext}>Note : This is intial version of app, so there can be bugs, be sure to report them to us! and lot of features are coming soon!</Text>
     </View>
   );
 };
@@ -124,6 +132,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  tiptext: {
+    color: '#fff',
+    fontFamily: Platform.select({
+      ios: 'Poppins-Medium',
+      android: 'Poppins_500Medium'
+    }),
+    fontSize: 15,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 20
+
   },
   circleContainer: {
     flexDirection: 'row',
@@ -160,4 +180,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
+  
 });

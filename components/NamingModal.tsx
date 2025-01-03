@@ -47,16 +47,16 @@ const NamingModal: React.FC<NamingModalProps> = ({ isVisible, timerName, setTime
             value={timerName}
             onChangeText={setTimerName}
           />
-          <Text style={styles.durationText}>Select Duration:</Text>
+          <Text style={styles.durationText}>Select Duration (in minutes):</Text>
           <View style={styles.durationOptions}>
             <TouchableOpacity style={[styles.durationButton, selectedDuration === 15 * 60 && styles.selectedButton]} onPress={() => setSelectedDuration(15 * 60)}>
-              <Text style={styles.durationButtonText}>15 Minutes</Text>
+              <Text style={styles.durationButtonText}>15</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.durationButton, selectedDuration === 30 * 60 && styles.selectedButton]} onPress={() => setSelectedDuration(30 * 60)}>
-              <Text style={styles.durationButtonText}>30 Minutes</Text>
+              <Text style={styles.durationButtonText}>30 </Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.durationButton, selectedDuration === 60 * 60 && styles.selectedButton]} onPress={() => setSelectedDuration(60 * 60)}>
-              <Text style={styles.durationButtonText}>60 Minutes</Text>
+              <Text style={styles.durationButtonText}>60</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.durationButton, selectedDuration && ![15 * 60, 30 * 60, 60 * 60].includes(selectedDuration) ? styles.selectedButton : null]} onPress={handleCustomDuration}>
               <Text style={styles.durationButtonText}>Custom</Text>
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: '#cdd6f4',
     width: '100%',
+    borderRadius: 15,
   },
   durationText: {
     color: '#cdd6f4',
@@ -107,28 +108,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   durationButton: {
-    backgroundColor: '#88C0D0',
-    padding: 10,
+    backgroundColor: 'rgba(32, 207, 120, 0.56)',
+    padding: 5,
     borderRadius: 5,
     alignItems: 'center',
     width: '22%',
+    textAlign: 'center'
   },
   selectedButton: {
     backgroundColor: '#5E81AC',
   },
   durationButtonText: {
-    color: '#2E3440',
+    color: '#fff',
     fontFamily: 'Poppins_500Medium',
+    fontWeight: '900'
   },
   savebtn: {
-    backgroundColor: '#88C0D0',
+    backgroundColor: 'rgba(96, 194, 121, 0.58)',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     width: '100%',
   },
   savebtntxt: {
-    color: '#2E3440',
+    color: '#fff',
     fontFamily: 'Poppins_500Medium',
   },
 });

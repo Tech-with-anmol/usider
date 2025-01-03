@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, Dimensions } from 'react-native';
 import { Account, Databases, Query } from 'react-native-appwrite';
 import { client } from '@/lib/appwrite';
 import Toast from 'react-native-toast-message';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+
+const { height, width} = Dimensions.get('window');
 
 const Friends = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -148,6 +152,13 @@ const Friends = () => {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false}}/>
+      <Text></Text>
+      <Text></Text>
+      
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={32} color="white" />
+      </TouchableOpacity>
       <Text style={styles.title}>Friends</Text>
       <TextInput
         style={styles.input}
@@ -166,6 +177,10 @@ const Friends = () => {
       <TouchableOpacity style={styles.addButton} onPress={addFriend}>
         <Text style={styles.addButtonText}>Add Friend</Text>
       </TouchableOpacity>
+      <Text style={styles.friendguide}>Ask your friend to go to their usider app settings and copy & share their i'd with you</Text>
+      <Text></Text>
+      <Text style={styles.friendguide}>Click on friend name to see their stats!</Text>
+      <Text></Text>
       <FlatList
         data={friends}
         keyExtractor={(item) => item.id}
@@ -222,16 +237,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#4C566A',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: 'rgba(91, 96, 161, 0.2)',
+    padding: 20,
+    borderRadius: 10,
     marginBottom: 10,
   },
   friendText: {
     color: '#D8DEE9',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  friendguide :{
+    color: '#ffffff',
+    fontWeight : '700',
+    fontSize: 14,
+    textAlign: 'center',
+
   },
   removeButton: {
     color: '#BF616A',
     fontWeight: '600',
+  },
+  backButton: {
+    position: 'absolute',
+    top: height * 0.05,
+    left: width * 0.05,
+    zIndex: 1,
   },
 });

@@ -39,7 +39,7 @@ const StatsPage = () => {
         const user = await account.get();
         setUserId(user.$id);
       } catch (error) {
-        console.error('Error fetching user:', error);
+       
         Toast.show({
           type: 'error',
           text1: 'Error',
@@ -73,10 +73,10 @@ const StatsPage = () => {
   );
 
   const syncDataToCloud = async (userId: string) => {
-    console.log('syncDataToCloud called');
+    
     try {
       const offlineData = await AsyncStorage.getItem('timerData');
-      console.log('Data from AsyncStorage:', offlineData);
+  
       if (offlineData) {
         const parsedData = JSON.parse(offlineData);
         if (Array.isArray(parsedData)) {
@@ -86,7 +86,7 @@ const StatsPage = () => {
               timerName: doc.timerName,
               totalTime: doc.totalTime,
             });
-            console.log('Synced data to cloud:', doc);
+           
           }
         } else {
           await databases.createDocument('67700254003a7728ac47', '6770037e0017ef452669', 'unique()', {
@@ -94,14 +94,14 @@ const StatsPage = () => {
             timerName: parsedData.timerName,
             totalTime: parsedData.totalTime,
           });
-          console.log('Synced data to cloud:', parsedData);
+          
         }
         await AsyncStorage.removeItem('timerData');
       }
       fetchTimerData(userId);
       fetchPathSelectionData(userId);
     } catch (error) {
-      console.error('Error syncing data to cloud:', error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -113,7 +113,7 @@ const StatsPage = () => {
   const fetchOfflineData = async () => {
     try {
       const offlineData = await AsyncStorage.getItem('timerData');
-      console.log('Data from AsyncStorage:', offlineData);
+      
       if (offlineData) {
         const parsedData = JSON.parse(offlineData);
         setTimerData(Array.isArray(parsedData) ? parsedData : [parsedData]);
@@ -123,7 +123,7 @@ const StatsPage = () => {
         calculateBarChartData(parsedData);
       }
     } catch (error) {
-      console.error('Error fetching offline data:', error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -144,7 +144,7 @@ const StatsPage = () => {
       calculateChartData(response.documents);
       calculateBarChartData(response.documents);
     } catch (error) {
-      console.error('Error fetching timer data:', error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -172,7 +172,7 @@ const StatsPage = () => {
       }));
       setPathSelectionData(formattedPathData);
     } catch (error) {
-      console.error('Error fetching path selection data:', error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',

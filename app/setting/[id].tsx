@@ -71,6 +71,7 @@ const Settingsnav = () => {
                 return (
                     <View style={styles.contactContainer}>
                         <Text style={styles.contactText}>We value your feedback!</Text>
+                        <Text></Text>
                         <TextInput
                             style={styles.feedbackInput}
                             placeholder="Write your feedback here..."
@@ -118,7 +119,7 @@ const Settingsnav = () => {
         <View style={{ flex: 1, backgroundColor: '#1e1e2e' }}>
           <Stack.Screen options={{ headerShown: false}}/>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="chevron-back" size={24} color="white" />
+                <Ionicons name="chevron-back" size={32} color="white" />
             </TouchableOpacity>
             {renderContents()}
             <Toast />

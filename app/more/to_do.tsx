@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Platform, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert, KeyboardAvoidingView } from 'react-native';
+import { Platform, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert, KeyboardAvoidingView, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Poppins_500Medium, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+const {height, width} = Dimensions.get('window');
 
 export default function ToDo() {
+    const router = useRouter();
     const [task, setTask] = useState<{ [key: string]: string }>({});
     const [tasks, setTasks] = useState<Task[]>([]);
     const [sections, setSections] = useState<Section[]>([]);
@@ -155,6 +160,14 @@ export default function ToDo() {
     return (
         
             <View style={styles.container}>
+                <Stack.Screen options={{headerShown: false}}/>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <Text></Text>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={32} color="white" />
+                </TouchableOpacity>
                 <Text style={styles.title}>To-Do List</Text>
                 <TextInput
                     style={styles.input}
@@ -386,5 +399,15 @@ const styles = StyleSheet.create({
     },
     completedCircle: {
         backgroundColor: '#88C0D0',
+    },
+    backButton: {
+        position: 'absolute',
+        top: height * 0.05,
+        left: width * 0.05,
+        zIndex: 1,
+    },
+    backButtonText: {
+        color: '#2E3440',
+        fontFamily: 'Poppins_500Medium',
     },
 });
