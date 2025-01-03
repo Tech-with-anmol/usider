@@ -59,7 +59,8 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "react-native-wheel-color-picker": "^1.3.1",
-    "undefined": "react-native-community/react-native-slider"
+    "undefined": "react-native-community/react-native-slider",
+    "lottie-react-native": "7.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
