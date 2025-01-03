@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
-import { Account, OAuthProvider } from 'react-native-appwrite';
+import { Account } from 'react-native-appwrite';
 import { client } from '../lib/appwrite';
-import { AntDesign } from '@expo/vector-icons'; // Import AntDesign for Google icon
+import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
 
 const SignInScreen = () => {
@@ -14,6 +14,7 @@ const SignInScreen = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isOffline, setIsOffline] = useState(false);
 
     const account = new Account(client);
     const router = useRouter();
@@ -30,6 +31,12 @@ const SignInScreen = () => {
             }
         };
         checkSession();
+
+        const unsubscribe = NetInfo.addEventListener(state => {
+            setIsOffline(!state.isConnected);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const handleSignIn = async () => {
@@ -61,8 +68,40 @@ const SignInScreen = () => {
         }
     };
 
-   
+    const handleOfflineMode = () => {
+        Alert.alert(
+            'Offline Mode',
+            'You are now in offline mode. Some features may not be available.',
+            [
+                {
+                    text: 'OK',
+                    onPress: () => router.replace('/(tabs)'),
+                },
+            ],
+            { cancelable: false }
+        );
+    };
 
+    useEffect(() => {
+        const syncUserAccount = async () => {
+            if (!isOffline) {
+                try {
+                    const session = await account.get();
+                    if (session) {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Online',
+                            text2: 'Your account has been synced.',
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error syncing account:', error);
+                }
+            }
+        };
+
+        syncUserAccount();
+    }, [isOffline]);
 
     if (!fontsLoaded) {
         return (
@@ -76,6 +115,7 @@ const SignInScreen = () => {
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false}}/>
+            <ScrollView>
             <Image 
             source={require('../assets/images/icon.png')}
             style={styles.logo}
@@ -100,7 +140,14 @@ const SignInScreen = () => {
             <TouchableOpacity style={styles.button} onPress={handleSignIn}>
                 <Text style={styles.buttonText}>Sign in</Text>
             </TouchableOpacity>
-            
+            {isOffline && (
+                <View style={styles.offlineContainer}>
+                    <Text style={styles.offlineText}>You are offline</Text>
+                    <TouchableOpacity style={styles.offlineButton} onPress={handleOfflineMode}>
+                        <Text style={styles.offlineButtonText}>Use Offline</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             <View style={styles.signUpContainer}>
                 <Text style={styles.signUpText}>Don't have an account?</Text>
                 <TouchableOpacity onPress={() => router.replace('../sign_up')}>
@@ -108,6 +155,7 @@ const SignInScreen = () => {
                 </TouchableOpacity>
             </View>
             <Toast />
+            </ScrollView>
         </View>
     );
 };
@@ -160,21 +208,22 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
     },
-    googleButton: {
-        height: 50,
-        backgroundColor: '#4285F4',
-        borderRadius: 8,
-        justifyContent: 'center',
+    offlineContainer: {
         alignItems: 'center',
-        flexDirection: 'row',
         marginBottom: 20,
     },
-    googleIcon: {
-        marginRight: 10,
+    offlineText: {
+        color: '#cdd6f4',
+        marginBottom: 10,
     },
-    googleButtonText: {
-        color: '#fff',
-        fontSize: 18,
+    offlineButton: {
+        backgroundColor: '#88C0D0',
+        padding: 10,
+        borderRadius: 8,
+    },
+    offlineButtonText: {
+        color: '#1e1e2e',
+        fontSize: 16,
         fontWeight: '600',
     },
     signUpContainer: {
