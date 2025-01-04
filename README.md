@@ -8,8 +8,6 @@ this is initial version of app and so there is lot and lot of stuff to be adeed.
 
 # Screenshots
 
-**Note - These Screenshot are outdated**
-
 ![screenshot](image-1.png)
 ![screebnshot](image-2.png)
 ![screenshot](image-3.png)
