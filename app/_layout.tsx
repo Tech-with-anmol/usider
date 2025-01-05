@@ -3,8 +3,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { requestNotificationPermissions, scheduleDailyStreakNotification } from '@/lib/notifications';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -17,6 +18,15 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    const setupNotifications = async () => {
+      await requestNotificationPermissions();
+      await scheduleDailyStreakNotification();
+    };
+
+    setupNotifications();
+  }, []);
 
   if (!loaded) {
     return null;

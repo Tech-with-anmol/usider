@@ -20,7 +20,7 @@ export default function OnboardingScreen() {
     const checkOnboarding = async () => {
       const hasOnboarded = await AsyncStorage.getItem('hasOnboarded');
       if (hasOnboarded) {
-        router.replace('/load');
+        //router.replace('/load');
       }
     };
     checkOnboarding();

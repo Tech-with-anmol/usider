@@ -39,7 +39,7 @@
     },
     "android": {
       "package": "com.ak.usider",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan"  
     }
   }
 }
