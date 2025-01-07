@@ -22,7 +22,7 @@ this is initial version of app and so there is lot and lot of stuff to be adeed.
 
 # Use of AI
 
-*AI refers to copilot only(no other ai is used in any form), copilot was being using to refactor code, help in error fixing, and very rarely for fast generation of component*
+*AI refers to copilot only(no other ai is used in any form), copilot was being using to refactor/refine code, help in error fixing, and very rarely for fast generation of component*
 
 *The path/[id] component was refactored using AI and this was one and only use of AI in refactoring*
 
