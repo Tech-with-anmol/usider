@@ -26,8 +26,8 @@ const Pathsresult = () => {
   const [timerName, setTimerName] = useState('');
   const [isNaming, setIsNaming] = useState(true);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const [totalDuration, setTotalDuration] = useState<number>(Math.min(parseInt(duration) || 0, 64 * 60 * 60)); // Ensure totalDuration is within valid range
-  const [currentTimerTime, setCurrentTimerTime] = useState<number>(Math.min(parseInt(duration) || 0, 64 * 60 * 60)); // Ensure currentTimerTime is within valid range
+  const [totalDuration, setTotalDuration] = useState<number>(Math.min(parseInt(duration) || 0, 64 * 60 * 60)); 
+  const [currentTimerTime, setCurrentTimerTime] = useState<number>(Math.min(parseInt(duration) || 0, 64 * 60 * 60)); 
   const [customDurationModalVisible, setCustomDurationModalVisible] = useState(false);
   const [customDuration, setCustomDuration] = useState('');
 
@@ -154,14 +154,14 @@ const Pathsresult = () => {
 
   useEffect(() => {
     if (currentTimerTime <= 0) {
-      setIsNaming(true); // Show the naming modal when the timer completes
+      setIsNaming(true);
     }
   }, [currentTimerTime]);
 
   const handleTimerUpdate = useCallback((time: number) => {
     setCurrentTimerTime(time);
     if (time <= 0) {
-      setIsNaming(true); // Show the naming modal when the timer completes
+      setIsNaming(true);
     }
   }, []);
 

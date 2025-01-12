@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.hackclub.usider"
+      "bundleIdentifier": "com.ak.usider"
     },
     "plugins": [
       "expo-router",

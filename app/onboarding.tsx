@@ -20,7 +20,7 @@ export default function OnboardingScreen() {
     const checkOnboarding = async () => {
       const hasOnboarded = await AsyncStorage.getItem('hasOnboarded');
       if (hasOnboarded) {
-        //router.replace('/load');
+        
       }
     };
     checkOnboarding();
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   doneButton: {
     padding: 20,
-    //backgroundColor: '#000',
+   
     borderRadius: 5,
   },
   doneButtonText: {

@@ -128,25 +128,25 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(214, 192, 179, 0.2)', // darker background color with transparency
+    backgroundColor: 'rgba(214, 192, 179, 0.2)', 
     padding: 20,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    margin: 20, // add margin to create gaps
+    margin: 20, 
   },
   digistyle: {
     color: '#fff',
-    fontSize: width * 0.15, // responsive font size
+    fontSize: width * 0.15, 
     borderRadius: 5,
-    width: width * 0.2, // responsive width
+    width: width * 0.2, 
     textAlign: 'center',
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#333',
-    backgroundColor: 'rgba(171, 136, 109, 0.4)', // darker shade of background color with transparency
+    backgroundColor: 'rgba(171, 136, 109, 0.4)', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   separatorstyle: {
     color: '#000',
-    fontSize: width * 0.15, // responsive font size
+    fontSize: width * 0.15, 
     marginHorizontal: 10,
   },
   flipContainer: {
@@ -169,9 +169,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   flipCardContainer: {
-    width: width * 0.2, // responsive width
-    height: width * 0.25, // responsive height
-    transform: [{ perspective: 1000 }], // Add perspective to create a 3D effect
+    width: width * 0.2,
+    height: width * 0.25,
+    transform: [{ perspective: 1000 }],
   },
   flipCard: {
     backfaceVisibility: 'hidden',

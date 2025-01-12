@@ -4,7 +4,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { Account } from 'react-native-appwrite';
 import { client } from '../lib/appwrite';
-import { AntDesign } from '@expo/vector-icons'; // Import AntDesign for Google icon
+import { AntDesign } from '@expo/vector-icons'; 
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -78,7 +78,7 @@ const SignUpScreen = () => {
     };
 
     if (!fontsLoaded) {
-        return null; // or a loading spinner
+        return null; 
     }
 
     return (

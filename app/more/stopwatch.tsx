@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20, // add padding to create gaps
-    borderRadius: 10, // add border radius for rounded corners
+    padding: 20, 
+    borderRadius: 10, 
   },
   timerControl: {
     position: 'absolute',

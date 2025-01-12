@@ -48,39 +48,39 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     justifyContent: "flex-end",
-    paddingBottom: height * 0.05, // Adjust padding based on device height
-    paddingHorizontal: width * 0.1, // Adjust padding based on device width
+    paddingBottom: height * 0.05, 
+    paddingHorizontal: width * 0.1, 
     gap: 10,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   title: {
     color: Colors.white,
-    fontSize: width * 0.06, // Responsive font size
+    fontSize: width * 0.06, 
     letterSpacing: 1.5,
-    lineHeight: width * 0.09, // Responsive line height
+    lineHeight: width * 0.09, 
     textAlign: 'center',
     fontWeight: '600',
   },
   detailsheadphone: {
     color: '#C0C0C0',
     fontWeight: '500',
-    lineHeight: width * 0.05, // Responsive line height
+    lineHeight: width * 0.05, 
     letterSpacing: 1.2,
-    fontSize: width * 0.04, // Responsive font size
+    fontSize: width * 0.04, 
     textAlign: 'center',
-    marginHorizontal: width * 0.08, // Responsive margin
+    marginHorizontal: width * 0.08, 
   },
   btn: {
     backgroundColor: Colors.tint,
-    paddingVertical: height * 0.02, // Responsive padding
-    marginVertical: height * 0.03, // Responsive margin
+    paddingVertical: height * 0.02,
+    marginVertical: height * 0.03,
     alignItems: 'center',
     borderRadius: 16,
-    zIndex: 1, // Ensure the button is on top
+    zIndex: 1, 
   },
   btntext: {
     fontWeight: '700',
-    fontSize: width * 0.04, // Responsive font size
+    fontSize: width * 0.04, 
   },
 });
 

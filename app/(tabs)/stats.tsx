@@ -136,7 +136,7 @@ const StatsPage = () => {
     try {
       const response = await databases.listDocuments('67700254003a7728ac47', '6770037e0017ef452669', [
         Query.equal('userId', userId),
-        Query.orderDesc('$createdAt') // Ensure the latest data is fetched
+        Query.orderDesc('$createdAt') 
       ]);
       setTimerData(response.documents);
       calculateTotalTime(response.documents);
@@ -157,7 +157,7 @@ const StatsPage = () => {
     try {
       const response = await databases.listDocuments('67700254003a7728ac47', '67712065003e44192265', [
         Query.equal('userId', userId),
-        Query.orderDesc('$createdAt') // Ensure the latest data is fetched
+        Query.orderDesc('$createdAt') 
       ]);
       const pathData = response.documents.reduce((acc: { [key: string]: number }, doc: any) => {
         acc[doc.pathId] = (acc[doc.pathId] || 0) + 1;
@@ -265,8 +265,7 @@ const StatsPage = () => {
   };
 
   if (!fontsLoaded) {
-    return null; // or a loading spinner
-  }
+    return null;
 
   return (
     <ScrollView style={styles.container}>

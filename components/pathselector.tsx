@@ -131,9 +131,9 @@ export default function Homescreen() {
         );
     }
 
-    const imageSize = width * 0.3; // Adjust the size based on the device width
-    const tipTextMarginTop = height * 0.17; // Adjust the margin based on the device height
-    const tipTextMarginBottom = height * 0.1; // Add bottom margin to ensure it doesn't overlap with the tab bar
+    const imageSize = width * 0.3; 
+    const tipTextMarginTop = height * 0.17; 
+    const tipTextMarginBottom = height * 0.1; 
   
     return (
         <SafeAreaView style={styles.container}>
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingBottom: 80, // Add padding to ensure tiptext is visible
+    paddingBottom: 80, 
   },
   title: {
     fontFamily: 'DMSerifDisplay_400Regular',
